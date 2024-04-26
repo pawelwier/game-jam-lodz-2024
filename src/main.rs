@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::{PrimaryWindow, WindowResolution}};
 use controller::systems::handle_add_item;
-use item::{resources::ItemInventory, systems::{draw_inventory_bg, draw_inventory_items}};
+use item::{resources::{ItemInventory, INVENTORY_BG_WIDTH}, systems::{draw_inventory_bg, draw_inventory_items}};
 
 mod item;
 mod controller;
@@ -19,6 +19,28 @@ pub fn spawn_camera(
             transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
             ..Default::default()
         }
+    );
+}
+
+pub fn draw_game_bg(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>
+) -> () {
+    commands.spawn(
+        (
+            SpriteBundle {
+                texture: asset_server.load("sprites/game_bg.png"),
+                transform: Transform { 
+                    translation: Vec3 { 
+                        x: WINDOW_WIDTH / 2.0 - INVENTORY_BG_WIDTH / 2.0,
+                        y: WINDOW_HEIGHT / 2.0, 
+                        z: 0.0
+                    },
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        )
     );
 }
 
@@ -44,6 +66,7 @@ fn main() {
         .init_resource::<ItemInventory>()
         .add_systems(Startup, spawn_camera)
         .add_systems(Startup, draw_inventory_bg)
+        .add_systems(Startup, draw_game_bg)
         .add_systems(Update, handle_add_item)
         .add_systems(Update, draw_inventory_items)
         .run();

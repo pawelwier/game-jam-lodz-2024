@@ -1,8 +1,8 @@
-use std::ops::Index;
-
 use bevy::prelude::*;
 
-use super::{components::{Item, ItemType, ITEM_HEIGHT, ITEM_WIDTH}, resources::ItemInventory};
+use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
+
+use super::{components::{Item, ItemType, ITEM_HEIGHT, ITEM_WIDTH}, resources::{ItemInventory, INVENTORY_BG_WIDTH}};
 
 pub fn spawn_inventory_item(
     commands: &mut Commands,
@@ -34,7 +34,11 @@ pub fn draw_inventory_bg(
             SpriteBundle {
                 texture: asset_server.load("sprites/inventory_bg.png"),
                 transform: Transform { 
-                    translation: Vec3 { x: 1050.0, y: 450.0, z: 0.0 },
+                    translation: Vec3 { 
+                        x: WINDOW_WIDTH - INVENTORY_BG_WIDTH / 2.0 - 50.0,
+                        y: WINDOW_HEIGHT / 2.0, 
+                        z: 0.0
+                    },
                     ..Default::default()
                 },
                 ..Default::default()
@@ -48,9 +52,14 @@ pub fn draw_inventory_items(
     asset_server: Res<AssetServer>,
     inventory: Res<ItemInventory>
 ) -> () {
-    let types: [ItemType; 3] = [ItemType::C, ItemType::B, ItemType::A];
+    let types: [ItemType; 3] = [
+        ItemType::C, ItemType::B, ItemType::A
+    ];
 
-    let row_initial_position: (f32, f32) = (1000.0, 450.0);
+    let row_initial_position: (f32, f32) = (
+        WINDOW_WIDTH - INVENTORY_BG_WIDTH,
+        WINDOW_HEIGHT / 2.0
+    );
     const MARGIN: f32 = 15.0;
 
     types
@@ -65,49 +74,13 @@ pub fn draw_inventory_items(
                     spawn_inventory_item(
                         &mut commands,
                         &asset_server,
-                        (row_initial_position.0 + i as f32 * (ITEM_WIDTH + MARGIN), row_initial_position.1 + (ITEM_HEIGHT + MARGIN) * type_index as f32),
+                        (
+                            row_initial_position.0 + i as f32 * (ITEM_WIDTH + MARGIN), 
+                            row_initial_position.1 + (ITEM_HEIGHT + MARGIN) * type_index as f32
+                        ),
                         item.get_icon()
                     )
                 }
             }
         });
 }
-
-
-// pub fn draw_inventory_items(
-//     mut commands: Commands,
-//     asset_server: Res<AssetServer>,
-//     inventory: Res<ItemInventory>
-// ) -> () {
-//     // TODO: refactor, super ugly
-//     let item_a_count = inventory.get_item_type_count(ItemType::A);
-//     let item_b_count  = inventory.get_item_type_count(ItemType::B);
-//     let item_c_count = inventory.get_item_type_count(ItemType::C);
-
-//     for i in 0..item_a_count {
-//         spawn_inventory_item(
-//             &mut commands,
-//             &asset_server,
-//             (1000.0 + i as f32 * 50.0, 450.0),
-//             "item_a.png".to_string()
-//         )
-//     }
-
-//     for i in 0..item_b_count {
-//         spawn_inventory_item(
-//             &mut commands,
-//             &asset_server,
-//             (1000.0 + i as f32 * 50.0, 500.0),
-//             "item_b.png".to_string()
-//         )
-//     }
-
-//     for i in 0..item_c_count {
-//         spawn_inventory_item(
-//             &mut commands,
-//             &asset_server,
-//             (1000.0 + i as f32 * 50.0, 550.0),
-//             "item_c.png".to_string()
-//         )
-//     }
-// }
