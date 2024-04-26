@@ -22,6 +22,15 @@ impl ItemInventory {
         self.items.push(item);
     }
 
+    pub fn get_items_of_type(&self, item_type: ItemType) -> Vec<Item> {
+        self.items
+        .iter()
+        .map(|item| *item)
+        .filter(|item| { item.item_type == item_type })
+        .collect()
+    }
+
+
     pub fn get_item_type_count(&self, item_type: ItemType) -> usize {
         self.items
             .iter()

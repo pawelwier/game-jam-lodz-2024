@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+pub const ITEM_WIDTH : f32 = 34.0;
+pub const ITEM_HEIGHT : f32 = 33.0;
+
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub enum ItemType {
     A,
@@ -15,10 +18,12 @@ pub struct Item {
 impl Item {
     pub fn get_icon(&self) -> String {
         let icon: &str =  if self.item_type == ItemType::A {
-            "a"
+            "item_a.png"
         } else if self.item_type == ItemType::B {
-            "b"
-        } else { "c" };
+            "item_b.png"
+        } else { 
+            "item_c.png" 
+        };
 
         return icon.to_string();
     }
