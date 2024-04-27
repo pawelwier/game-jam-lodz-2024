@@ -1,8 +1,31 @@
 use bevy::prelude::*;
 
-use crate::{point_area::{components::{Area, AreaId, AreaType}, resources::AreaInventories}, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{
+    point_area::{
+        components::{
+            Area, AreaId, AreaType
+        }, 
+        resources::AreaInventories
+    }, 
+    WINDOW_HEIGHT, 
+    WINDOW_WIDTH
+};
 
-use super::{components::{CharacterItem, Item, ItemType, ITEM_HEIGHT, ITEM_TYPES, ITEM_WIDTH}, resources::{CharItemInventory, ItemInventory, INVENTORY_BG_WIDTH}};
+use super::{
+    components::{
+        CharacterItem, 
+        Item, 
+        ItemType, 
+        ITEM_HEIGHT, 
+        ITEM_TYPES, 
+        ITEM_WIDTH
+    }, 
+    resources::{
+        CharItemInventory, 
+        ItemInventory, 
+        INVENTORY_BG_WIDTH
+    }
+};
 
 pub fn spawn_inventory_item(
     commands: &mut Commands,
@@ -103,10 +126,10 @@ pub fn draw_area_inventory_items(
         asset_server,
         &inventory.1,
         (
-            area_transform.translation.x - ITEM_WIDTH / 3.0,
-            area_transform.translation.y
+            area_transform.translation.x - ITEM_WIDTH / 2.0,
+            area_transform.translation.y - ITEM_HEIGHT / 2.0
         ),
-        0.3,
+        0.4,
         false
     )
 
@@ -164,14 +187,4 @@ pub fn draw_inventory_items(
                 }
             }
         });
-}
-
-
-pub fn despawn_inventories(
-    commands: &mut Commands,
-    area_query: Query<Entity, With<Area>>,
-) -> () {
-    for entity in area_query.iter() {
-        commands.entity(entity).despawn();
-    }
 }

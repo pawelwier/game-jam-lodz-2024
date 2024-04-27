@@ -38,7 +38,7 @@ pub fn handle_add_item(
     }
 
     if is_key_just_pressed(&input, KeyCode::Enter) {
-        app_state_next_state.set(GameState::Play);
+        app_state_next_state.set(GameState::GetReady);
     }
 }
 

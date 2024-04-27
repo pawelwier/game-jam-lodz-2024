@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::WindowResolution};
 use character::{resources::CharMovement, systems::{check_laser_char_collision, set_character_speed, spawn_character}};
 use controller::systems::{handle_add_item, handle_char_movement};
 use enemy::{resources::LaserTimer, systems::{move_lasers, shoot_lasers, spawn_ufos, tick_laser_timer}};
-use game::{systems::spawn_camera, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
+use game::{systems::{draw_game_bg, handle_get_ready, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 use item::{resources::CharItemInventory, systems::{draw_char_inventory_items, draw_inventory_bg}};
 use point_area::{
     events::AreaCaptured, 
@@ -50,12 +50,20 @@ fn main() {
         .add_systems(Startup, (
             spawn_camera,
             draw_inventory_bg,
-            draw_point_areas,
+            draw_game_bg
+        ))
+        .add_systems(Update, (
+                handle_add_item, draw_char_inventory_items
+            ).run_if(in_state(GameState::LoadInventory))
+        )
+        .add_systems(OnEnter(GameState::GetReady), (draw_point_areas, handle_get_ready))
+        .add_systems(Update, handle_get_ready.run_if(in_state(GameState::GetReady)))
+        .add_systems(OnEnter(GameState::Play), (
+            add_random_area_items,
+            set_character_speed,
             spawn_character,
             spawn_ufos
         ))
-        .add_systems(Update, (handle_add_item, draw_char_inventory_items).run_if(in_state(GameState::LoadInventory)))
-        .add_systems(OnEnter(GameState::Play), (add_random_area_items, set_character_speed))
         .add_systems(Update, (
             handle_char_movement,
             animate_sprites,

@@ -20,6 +20,7 @@ pub enum GameState {
     // MainMenu,
     #[default]
     LoadInventory,
+    GetReady,
     Play,
     GameOver
 }

@@ -3,7 +3,6 @@ use bevy::prelude::*;
 use super::components::{Item, ItemType};
 
 pub const INVENTORY_BG_WIDTH: f32 = 200.0;
-pub const INVENTORY_BG_HEIGHT: f32 = 300.0;
 pub const MAX_ITEM_TYPE: usize = 3;
 
 #[derive(Resource)]

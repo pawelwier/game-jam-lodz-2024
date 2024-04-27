@@ -1,8 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::item::resources::INVENTORY_BG_WIDTH;
+use crate::{controller::utils::is_key_just_pressed, item::resources::INVENTORY_BG_WIDTH};
 
-use super::{components::GameBg, WINDOW_HEIGHT, WINDOW_WIDTH};
+use super::{components::GameBg, GameState, MOVE_AREA_MARGIN, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 pub fn spawn_camera(
     mut commands: Commands,
@@ -28,7 +28,7 @@ pub fn draw_game_bg(
                 texture: asset_server.load("sprites/game_bg.png"),
                 transform: Transform { 
                     translation: Vec3 { 
-                        x: WINDOW_WIDTH / 2.0 - INVENTORY_BG_WIDTH / 2.0,
+                        x: WINDOW_WIDTH / 2.0 - INVENTORY_BG_WIDTH / 2.0 - MOVE_AREA_MARGIN / 2.0,
                         y: WINDOW_HEIGHT / 2.0, 
                         z: 0.0
                     },
@@ -39,6 +39,15 @@ pub fn draw_game_bg(
             GameBg {}
         )
     );
+}
+
+pub fn handle_get_ready(
+    input: Res<ButtonInput<KeyCode>>,
+    mut app_state_next_state: ResMut<NextState<GameState>>
+) -> () {
+    if is_key_just_pressed(&input, KeyCode::Enter) {
+        app_state_next_state.set(GameState::Play);
+    }
 }
 
 pub fn objects_collide(

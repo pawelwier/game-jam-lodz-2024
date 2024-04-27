@@ -1,8 +1,28 @@
 use bevy::prelude::*;
 
-use crate::{animation::{components::{AnimatedEntity, AnimationIndices, SpriteLayout}, systems::spawn_animated_entity}, enemy::{components::Laser, LASER_SIZE}, game::{components::GameBg, systems::objects_collide, GameState}, item::{components::CharacterItem, resources::CharItemInventory}};
+use crate::{
+    animation::{
+        components::{
+            AnimatedEntity, AnimationIndices, SpriteLayout
+        }, 
+        systems::spawn_animated_entity
+    }, 
+    enemy::{
+        components::Laser, LASER_SIZE
+    }, game::{
+        systems::objects_collide, GameState
+    }, item::resources::CharItemInventory
+};
 
-use super::{components::Character, resources::{CharMovement, MovementState}, CHAR_FRAME_COUNT, CHAR_SIZE, CHAR_SPEED};
+use super::{
+    components::Character, 
+    resources::{
+        CharMovement, MovementState
+    }, 
+    CHAR_FRAME_COUNT, 
+    CHAR_SIZE, 
+    CHAR_SPEED
+};
 
 fn get_char_animated_entity(
     asset_server: Res<AssetServer>,
@@ -34,31 +54,24 @@ pub fn get_char_animation(
 
 pub fn spawn_character(
     commands: Commands,
-    game_bg_query: Query<&Transform, With<GameBg>>,
     asset_server: Res<AssetServer>,
     texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    // if let Ok(bg) = game_bg_query.get_single() {
-        spawn_animated_entity(
-            commands,
-            get_char_animation(
-                &MovementState::Idle,
-                asset_server
-            ),
-            Vec3 { 
-                // x: bg.translation.x / 2.0,
-                // y: bg.translation.y / 2.0,
-                x: 300.0,
-                y: 400.0,
-                z: 0.0 
-            },
-            texture_atlas_layouts,
-            Character {}
-        );
-    // } else { 
-        // return;
-    // }   
-}
+    spawn_animated_entity(
+        commands,
+        get_char_animation(
+            &MovementState::Idle,
+            asset_server
+        ),
+        Vec3 { 
+            x: 300.0,
+            y: 400.0,
+            z: 0.0 
+        },
+        texture_atlas_layouts,
+        Character {}
+    );
+} 
 
 pub fn set_character_speed(
     item_inventory: Res<CharItemInventory>,
@@ -66,7 +79,7 @@ pub fn set_character_speed(
 ) -> () {
     let item_count = item_inventory.inventory.items.len();
 
-    char_movement.set_speed(CHAR_SPEED - 30.0 * item_count as f32);
+    char_movement.set_speed(CHAR_SPEED - 35.0 * item_count as f32);
 }
 
 pub fn check_laser_char_collision(

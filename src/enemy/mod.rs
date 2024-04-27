@@ -11,7 +11,6 @@ pub const LASER_SPEED: f32 = 300.0;
 const UP_DOWN_TIMER: f32 = 3.4;
 const LEFT_RIGHT_TIMER: f32 = 4.1;
 
-pub const UFO_SIZE: f32 = 91.0;
 pub const LASER_SIZE: f32 = 14.0;
 
 pub const UFO_BOTTOM_POS: (f32, f32) = (MOVE_AREA_POS.0 + MOVE_AREA_SIZE.0 / 2.0, MOVE_AREA_MARGIN);
