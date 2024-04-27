@@ -10,7 +10,7 @@ use crate::{
             Item, 
             ItemType
         }, 
-        resources::{CharItemInventory, ItemInventory}
+        resources::CharItemInventory
     }
 };
 

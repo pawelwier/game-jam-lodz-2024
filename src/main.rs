@@ -2,8 +2,8 @@ use animation::systems::animate_sprites;
 use bevy::{prelude::*, window::WindowResolution};
 use character::{resources::CharMovement, systems::spawn_character};
 use controller::systems::{handle_add_item, handle_char_movement};
-use game::{systems::{draw_game_bg, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
-use item::{resources::CharItemInventory, systems::{draw_all_area_inventory_items, draw_char_inventory_items, draw_inventory_bg, draw_inventory_items}};
+use game::{systems::spawn_camera, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
+use item::{resources::CharItemInventory, systems::{draw_char_inventory_items, draw_inventory_bg}};
 use point_area::{resources::AreaInventories, systems::{add_random_area_items, check_step_on_area, draw_point_areas}};
 
 mod game;
@@ -44,15 +44,11 @@ fn main() {
         ))
         .add_systems(Update, (handle_add_item, draw_char_inventory_items).run_if(in_state(GameState::LoadInventory)))
         .add_systems(Update, draw_char_inventory_items)
-        .add_systems(OnEnter(GameState::Play), 
-            add_random_area_items
-            // .before(draw_all_area_inventory_items)
-        )
+        .add_systems(OnEnter(GameState::Play), add_random_area_items)
         .add_systems(Update, (
             handle_char_movement,
             animate_sprites,
-            draw_all_area_inventory_items,
-            // check_step_on_area
+            check_step_on_area
         ).run_if(in_state(GameState::Play)))
         .run();
 }

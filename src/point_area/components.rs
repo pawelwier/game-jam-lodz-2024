@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum AreaType {
     Empty,
     Available,
@@ -8,7 +8,7 @@ pub enum AreaType {
     Used
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum AreaId {
     BottomLeft,
     BottomRight,
@@ -16,7 +16,7 @@ pub enum AreaId {
     TopRight
 }
 
-#[derive(Clone, Component, Copy)]
+#[derive(Clone, Component, Copy,Debug)]
 pub struct Area {
     pub id: AreaId,
     pub area_type: AreaType,

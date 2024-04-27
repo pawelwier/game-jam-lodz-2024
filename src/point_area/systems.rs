@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::{Rng, thread_rng};
 
-use crate::{character::{components::Character, CHAR_SIZE}, game::systems::objects_collide, item::{components::{Item, ITEM_TYPES}, resources::{CharItemInventory, MAX_ITEM_TYPE}}};
+use crate::{character::{components::Character, CHAR_SIZE}, game::systems::objects_collide, item::{components::{Item, ITEM_TYPES}, resources::{CharItemInventory, MAX_ITEM_TYPE}, systems::draw_all_area_inventory_items}};
 
 use super::{components::{Area, AreaType}, resources::AreaInventories, AREA_POSITIONS, AREA_SIZE};
 
@@ -30,8 +30,9 @@ pub fn draw_point_areas(
 }
 
 pub fn add_random_area_items(
+    commands: Commands,
     asset_server: Res<AssetServer>,
-    area_query: Query<&Area, With<Area>>,
+    area_query: Query<(&Transform, &mut Area), With<Area>>,
     mut area_inventories: ResMut<AreaInventories>,
     char_inventory: ResMut<CharItemInventory>
 ) -> () {
@@ -45,42 +46,43 @@ pub fn add_random_area_items(
         }
     }
 
+    draw_all_area_inventory_items(
+        commands,
+        asset_server,
+        area_query,
+        &area_inventories
+    );
+
     update_area_types(
-        &area_inventories,
+        area_inventories,
         &char_inventory,
-        area_query
     );
 }
 
 fn update_area_types(
-    area_inventories: &AreaInventories,
-    char_inventory: &CharItemInventory,
-    area_query: Query<&Area, With<Area>>
+    mut area_inventories: ResMut<AreaInventories>,
+    char_inventory: &CharItemInventory
 ) -> () {
     for i in 0..area_inventories.inventories.len() {
         let mut can_get_points: bool = true; 
-        let (id, items) = &area_inventories.inventories[i];
+        let (_, items, _) = &area_inventories.inventories[i];
         for item_type in ITEM_TYPES {
             let char_type_count = char_inventory.inventory.get_item_type_count(item_type);
             let area_type_count = items.get_item_type_count(item_type);
             if area_type_count > char_type_count { can_get_points = false; }
         }
-        let mut area = area_query
-            .iter()
-            .map(|a| { *a })
-            .find(|a| { a.id == *id })
-            .unwrap();
         if can_get_points {
-            area.area_type = AreaType::Available;
+            area_inventories.inventories[i].2 = AreaType::Available;
         } else {
-            area.area_type = AreaType::Forbidden;
+            area_inventories.inventories[i].2 = AreaType::Forbidden;
         }
     }
 }
 
 pub fn check_step_on_area(
     area_query: Query<(&Transform, &Area), With<Area>>,
-    char_query: Query<&Transform, With<Character>>
+    char_query: Query<&Transform, With<Character>>,
+    area_inventories: ResMut<AreaInventories>
 ) -> () {
     let char_transform = char_query.get_single().unwrap();
 
@@ -95,8 +97,13 @@ pub fn check_step_on_area(
                 (AREA_SIZE, AREA_SIZE)
             ),
         ) {
-            if area.area_type == AreaType::Available {
-                println!("bam")
+            let area_item = area_inventories.inventories
+                .iter()
+                .find(|a| { a.0 == area.id })
+                .unwrap();
+
+            if area_item.2 == AreaType::Available {
+                println!("{:?}", area.id);
             }
         }
     }

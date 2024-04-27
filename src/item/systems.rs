@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use crate::{point_area::{components::{Area, AreaId}, resources::AreaInventories}, WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::{point_area::{components::{Area, AreaId, AreaType}, resources::AreaInventories}, WINDOW_HEIGHT, WINDOW_WIDTH};
 
-use super::{components::{Item, ItemType, ITEM_HEIGHT, ITEM_TYPES, ITEM_WIDTH}, resources::{CharItemInventory, ItemInventory, INVENTORY_BG_WIDTH}};
+use super::{components::{Item, ITEM_HEIGHT, ITEM_TYPES, ITEM_WIDTH}, resources::{CharItemInventory, ItemInventory, INVENTORY_BG_WIDTH}};
 
 pub fn spawn_inventory_item(
     commands: &mut Commands,
@@ -52,8 +52,8 @@ pub fn draw_inventory_bg(
 pub fn draw_all_area_inventory_items(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    area_query: Query<(&Transform, &Area), With<Area>>,
-    area_inventories: ResMut<AreaInventories>
+    area_query: Query<(&Transform, &mut Area), With<Area>>,
+    area_inventories: &ResMut<AreaInventories>
 ) -> () {
     for (area_transform, area) in area_query.iter() {
         draw_area_inventory_items(
@@ -71,7 +71,7 @@ pub fn draw_area_inventory_items(
     asset_server: &AssetServer,
     area: &Area,
     area_transform: &Transform,
-    area_inventories: &[(AreaId, ItemInventory); 4]
+    area_inventories: &[(AreaId, ItemInventory, AreaType); 4]
 ) -> () {
     let inventory = area_inventories
         .iter()
