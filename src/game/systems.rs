@@ -40,3 +40,22 @@ pub fn draw_game_bg(
         )
     );
 }
+
+pub fn objects_collide(
+    object_one: (
+        (f32, f32),
+        (f32, f32)
+    ),
+    object_two: (
+        (f32, f32),
+        (f32, f32)
+    ),
+) -> bool {
+    let (pos_one, size_one) = object_one;
+    let (pos_two, size_two) = object_two;
+
+    (pos_one.0 + size_one.0 / 2.0 > pos_two.0 - size_two.0 / 2.0)
+        && (pos_one.0 - size_one.0 / 2.0 < pos_two.0 + size_two.0 / 2.0)
+            && (pos_one.1 + size_one.1 / 2.0 > pos_two.1 - size_two.1 / 2.0)
+                && (pos_one.1 - size_one.1 / 2.0 < pos_two.1 + size_two.1 / 2.0)
+}

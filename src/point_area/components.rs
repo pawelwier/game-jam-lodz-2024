@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 
-use crate::item::resources::ItemInventory;
-
+#[derive(Clone, Copy, PartialEq)]
 pub enum AreaType {
     Empty,
     Available,
@@ -9,7 +8,7 @@ pub enum AreaType {
     Used
 }
 
-#[derive(PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum AreaId {
     BottomLeft,
     BottomRight,
@@ -17,13 +16,8 @@ pub enum AreaId {
     TopRight
 }
 
-#[derive(Component)]
+#[derive(Clone, Component, Copy)]
 pub struct Area {
     pub id: AreaId,
     pub area_type: AreaType,
-    // pub area_inventory: ItemInventory
-}
-
-impl Area {
-
 }

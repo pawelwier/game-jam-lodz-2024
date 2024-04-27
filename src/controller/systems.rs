@@ -67,15 +67,16 @@ pub fn handle_char_movement(
         let mut direction: Vec3 = Vec3::ZERO;
     
         if is_key_pressed(&input, KeyCode::ArrowLeft) { x = -1.0 }
-        if is_key_pressed(&input, KeyCode::ArrowRight) { x = 1.0 }
+        else if is_key_pressed(&input, KeyCode::ArrowRight) { x = 1.0 }
         if is_key_pressed(&input, KeyCode::ArrowDown) { y = -1.0 }
-        if is_key_pressed(&input, KeyCode::ArrowUp) { y = 1.0 }
+        else if is_key_pressed(&input, KeyCode::ArrowUp) { y = 1.0 }
     
         if x != 0.0 || y != 0.0 {
             direction += Vec3::new(x, y, 0.0);
             direction = direction.normalize();
             movement.set_state(MovementState::Move);
         } else {
+            direction = Vec3::ZERO;
             movement.set_state(MovementState::Idle);
         }
     
@@ -86,24 +87,24 @@ pub fn handle_char_movement(
             ), 
             direction
         ) { 
-            return; 
-        }
-    
-        if x < 0.0 {
-            char_transform.rotation = Quat::from_rotation_y(std::f32::consts::PI);
+            movement.set_state(MovementState::Idle);
         } else {
-            char_transform.rotation = Quat::default();
+            if x < 0.0 {
+                char_transform.rotation = Quat::from_rotation_y(std::f32::consts::PI);
+            } else {
+                char_transform.rotation = Quat::default();
+            }
+        
+            char_transform.translation += direction * movement.get_speed() * time.delta_seconds();
+        
+            set_atlas_layout(
+                movement,
+                asset_server,
+                &mut image, 
+                &mut atlas,
+                texture_atlas_layouts
+            )   
         }
-    
-        char_transform.translation += direction * movement.get_speed() * time.delta_seconds();
-    
-        set_atlas_layout(
-            movement,
-            asset_server,
-            &mut image, 
-            &mut atlas,
-            texture_atlas_layouts
-        )
     } else {
         return;
     }
