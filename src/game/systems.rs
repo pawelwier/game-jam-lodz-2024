@@ -1,8 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::{controller::utils::is_key_just_pressed, item::resources::INVENTORY_BG_WIDTH};
+use crate::{controller::utils::is_key_just_pressed, item::resources::INVENTORY_BG_WIDTH, point_area::AREA_POSITIONS};
 
-use super::{components::GameBg, GameState, MOVE_AREA_MARGIN, WINDOW_HEIGHT, WINDOW_WIDTH};
+use super::{components::GameBg, resources::Score, GameState, MOVE_AREA_MARGIN, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 pub fn spawn_camera(
     mut commands: Commands,
@@ -67,4 +67,13 @@ pub fn objects_collide(
         && (pos_one.0 - size_one.0 / 2.0 < pos_two.0 + size_two.0 / 2.0)
             && (pos_one.1 + size_one.1 / 2.0 > pos_two.1 - size_two.1 / 2.0)
                 && (pos_one.1 - size_one.1 / 2.0 < pos_two.1 + size_two.1 / 2.0)
+}
+
+pub fn check_game_completed(
+    score: Res<Score>,
+    mut app_state_next_state: ResMut<NextState<GameState>>
+) -> () {
+    if score.points == AREA_POSITIONS.len() {
+        app_state_next_state.set(GameState::Completed);
+    }
 }

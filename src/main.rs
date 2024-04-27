@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::WindowResolution};
 use character::{resources::CharMovement, systems::{check_laser_char_collision, set_character_speed, spawn_character}};
 use controller::systems::{handle_add_item, handle_char_movement};
 use enemy::{resources::LaserTimer, systems::{move_lasers, shoot_lasers, spawn_ufos, tick_laser_timer}};
-use game::{systems::{draw_game_bg, handle_get_ready, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
+use game::{resources::Score, systems::{check_game_completed, draw_game_bg, handle_get_ready, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 use item::{resources::CharItemInventory, systems::{draw_char_inventory_items, draw_inventory_bg}};
 use point_area::{
     events::AreaCaptured, 
@@ -44,6 +44,7 @@ fn main() {
         .init_resource::<CharItemInventory>()
         .init_resource::<CharMovement>()
         .init_resource::<AreaInventories>()
+        .init_resource::<Score>()
         .init_resource::<ReloadAreasTimer>()
         .init_resource::<LaserTimer>()
         .add_event::<AreaCaptured>()
@@ -74,7 +75,8 @@ fn main() {
             tick_laser_timer,
             shoot_lasers,
             move_lasers,
-            check_laser_char_collision
+            check_laser_char_collision,
+            check_game_completed
         ).run_if(in_state(GameState::Play)))
         .run();
 }

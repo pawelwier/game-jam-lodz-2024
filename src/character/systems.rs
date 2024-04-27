@@ -21,7 +21,8 @@ use super::{
     }, 
     CHAR_FRAME_COUNT, 
     CHAR_SIZE, 
-    CHAR_SPEED
+    CHAR_SPEED,
+    CHAR_SPEED_PENALTY
 };
 
 fn get_char_animated_entity(
@@ -79,7 +80,7 @@ pub fn set_character_speed(
 ) -> () {
     let item_count = item_inventory.inventory.items.len();
 
-    char_movement.set_speed(CHAR_SPEED - 35.0 * item_count as f32);
+    char_movement.set_speed(CHAR_SPEED - CHAR_SPEED_PENALTY * item_count as f32);
 }
 
 pub fn check_laser_char_collision(

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::{Rng, thread_rng};
 
-use crate::{character::{components::Character, CHAR_SIZE}, game::systems::objects_collide, item::{components::{CharacterItem, Item, ITEM_TYPES}, resources::{CharItemInventory, MAX_ITEM_TYPE}, systems::draw_all_area_inventory_items}};
+use crate::{character::{components::Character, CHAR_SIZE}, game::{resources::Score, systems::objects_collide}, item::{components::{CharacterItem, Item, ITEM_TYPES}, resources::{CharItemInventory, MAX_ITEM_TYPE}, systems::draw_all_area_inventory_items}};
 
 use super::{components::{Area, AreaType}, events::AreaCaptured, resources::{AreaInventories, ReloadAreasTimer}, AREA_POSITIONS, AREA_SIZE};
 
@@ -84,6 +84,7 @@ pub fn check_step_on_area(
     area_query: Query<(&Transform, &Area), With<Area>>,
     char_query: Query<&Transform, With<Character>>,
     mut area_inventories: ResMut<AreaInventories>,
+    mut score: ResMut<Score>,
     mut captured_event_writer: EventWriter<AreaCaptured>
 ) -> () {
     let char_transform = char_query.get_single().unwrap();
@@ -103,6 +104,7 @@ pub fn check_step_on_area(
                 if area_inventories.inventories[i].0 == area.id && area_inventories.inventories[i].2 == AreaType::Available {
                     area_inventories.inventories[i].2 = AreaType::Used;
                     area_inventories.inventories[i].1.clear_items();
+                    score.points += 1;
                     captured_event_writer.send(AreaCaptured { id: area.id });
                 }
             }
