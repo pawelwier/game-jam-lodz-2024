@@ -1,3 +1,5 @@
+use bevy::prelude::*;
+
 use crate::item::resources::INVENTORY_BG_WIDTH;
 
 pub mod components;
@@ -12,3 +14,12 @@ pub const MOVE_AREA_SIZE: (f32, f32) = (
     WINDOW_WIDTH - INVENTORY_BG_WIDTH - 3.0 * MOVE_AREA_MARGIN,
     WINDOW_HEIGHT - 2.0 * MOVE_AREA_MARGIN
 );
+
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum GameState {
+    // MainMenu,
+    #[default]
+    LoadInventory,
+    Play,
+    GameOver
+}

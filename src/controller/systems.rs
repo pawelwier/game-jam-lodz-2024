@@ -5,7 +5,7 @@ use crate::{
         components::Character, resources::{
             CharMovement, MovementState
         }, CHAR_SIZE
-    }, game::{MOVE_AREA_POS, MOVE_AREA_SIZE}, item::{
+    }, game::{GameState, MOVE_AREA_POS, MOVE_AREA_SIZE}, item::{
         components::{
             Item, 
             ItemType
@@ -18,7 +18,8 @@ use super::utils::{is_key_just_pressed, is_key_pressed};
 
 pub fn handle_add_item(
     input: Res<ButtonInput<KeyCode>>,
-    mut item_inventory: ResMut<ItemInventory>
+    mut item_inventory: ResMut<ItemInventory>,
+    mut app_state_next_state: ResMut<NextState<GameState>>
 ) -> () {
     let input_type_map: [(KeyCode, ItemType); 3] = [
         (KeyCode::Digit1, ItemType::A),
@@ -32,7 +33,11 @@ pub fn handle_add_item(
         {
             item_inventory.add_item(Item { item_type });
         }
-    }   
+    }
+
+    if is_key_just_pressed(&input, KeyCode::Enter) {
+        app_state_next_state.set(GameState::Play);
+    }
 }
 
 fn limit_movement(
