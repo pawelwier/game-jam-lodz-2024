@@ -7,14 +7,20 @@ pub const INVENTORY_BG_HEIGHT: f32 = 300.0;
 const MAX_ITEM_TYPE: usize = 3;
 
 #[derive(Resource)]
+pub struct CharItemInventory {
+    pub inventory: ItemInventory
+}
+
 pub struct ItemInventory {
     pub items: Vec<Item>
 }
 
-impl Default for ItemInventory {
+impl Default for CharItemInventory {
     fn default() -> Self {
-        ItemInventory {
-            items: Vec::<Item>::new()
+        CharItemInventory {
+            inventory: ItemInventory {
+                items: Vec::<Item>::new()
+            }
         }
     }
 }

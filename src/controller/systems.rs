@@ -10,7 +10,7 @@ use crate::{
             Item, 
             ItemType
         }, 
-        resources::ItemInventory
+        resources::{CharItemInventory, ItemInventory}
     }
 };
 
@@ -18,7 +18,7 @@ use super::utils::{is_key_just_pressed, is_key_pressed};
 
 pub fn handle_add_item(
     input: Res<ButtonInput<KeyCode>>,
-    mut item_inventory: ResMut<ItemInventory>,
+    mut item_inventory: ResMut<CharItemInventory>,
     mut app_state_next_state: ResMut<NextState<GameState>>
 ) -> () {
     let input_type_map: [(KeyCode, ItemType); 3] = [
@@ -29,9 +29,9 @@ pub fn handle_add_item(
 
     for (code, item_type) in input_type_map {
         if is_key_just_pressed(&input, code)
-            && item_inventory.can_add_item_type(item_type)    
+            && item_inventory.inventory.can_add_item_type(item_type)    
         {
-            item_inventory.add_item(Item { item_type });
+            item_inventory.inventory.add_item(Item { item_type });
         }
     }
 
@@ -60,48 +60,52 @@ pub fn handle_char_movement(
     mut movement: ResMut<CharMovement>,
     time: Res<Time>
 ) -> () {
-    let (
-        mut char_transform, mut image, mut atlas
-    ) = char_query.get_single_mut().unwrap();
-    let (mut x, mut y): (f32, f32) = (0.0, 0.0);
-    let mut direction: Vec3 = Vec3::ZERO;
-
-    if is_key_pressed(&input, KeyCode::ArrowLeft) { x = -1.0 }
-    if is_key_pressed(&input, KeyCode::ArrowRight) { x = 1.0 }
-    if is_key_pressed(&input, KeyCode::ArrowDown) { y = -1.0 }
-    if is_key_pressed(&input, KeyCode::ArrowUp) { y = 1.0 }
-
-    if x != 0.0 || y != 0.0 {
-        direction += Vec3::new(x, y, 0.0);
-        direction = direction.normalize();
-        movement.set_state(MovementState::Move);
+    if let Ok(
+        (mut char_transform, mut image, mut atlas)
+    ) = char_query.get_single_mut() {
+        let (mut x, mut y): (f32, f32) = (0.0, 0.0);
+        let mut direction: Vec3 = Vec3::ZERO;
+    
+        if is_key_pressed(&input, KeyCode::ArrowLeft) { x = -1.0 }
+        if is_key_pressed(&input, KeyCode::ArrowRight) { x = 1.0 }
+        if is_key_pressed(&input, KeyCode::ArrowDown) { y = -1.0 }
+        if is_key_pressed(&input, KeyCode::ArrowUp) { y = 1.0 }
+    
+        if x != 0.0 || y != 0.0 {
+            direction += Vec3::new(x, y, 0.0);
+            direction = direction.normalize();
+            movement.set_state(MovementState::Move);
+        } else {
+            movement.set_state(MovementState::Idle);
+        }
+    
+        if limit_movement(
+            (
+                char_transform.translation.x,
+                char_transform.translation.y
+            ), 
+            direction
+        ) { 
+            return; 
+        }
+    
+        if x < 0.0 {
+            char_transform.rotation = Quat::from_rotation_y(std::f32::consts::PI);
+        } else {
+            char_transform.rotation = Quat::default();
+        }
+    
+        char_transform.translation += direction * movement.get_speed() * time.delta_seconds();
+    
+        set_atlas_layout(
+            movement,
+            asset_server,
+            &mut image, 
+            &mut atlas,
+            texture_atlas_layouts
+        )
     } else {
-        movement.set_state(MovementState::Idle);
+        return;
     }
-
-    if limit_movement(
-        (
-            char_transform.translation.x,
-            char_transform.translation.y
-        ), 
-        direction
-    ) { 
-        return; 
-    }
-
-    if x < 0.0 {
-        char_transform.rotation = Quat::from_rotation_y(std::f32::consts::PI);
-    } else {
-        char_transform.rotation = Quat::default();
-    }
-
-    char_transform.translation += direction * movement.get_speed() * time.delta_seconds();
-
-    set_atlas_layout(
-        movement,
-        asset_server,
-        &mut image, 
-        &mut atlas,
-        texture_atlas_layouts
-    )
+    
 }

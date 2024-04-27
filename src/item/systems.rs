@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
-use super::{components::{Item, ItemType, ITEM_HEIGHT, ITEM_WIDTH}, resources::{ItemInventory, INVENTORY_BG_WIDTH}};
+use super::{components::{Item, ItemType, ITEM_HEIGHT, ITEM_WIDTH}, resources::{CharItemInventory, INVENTORY_BG_WIDTH}};
 
 pub fn spawn_inventory_item(
     commands: &mut Commands,
@@ -50,7 +50,7 @@ pub fn draw_inventory_bg(
 pub fn draw_inventory_items(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    inventory: Res<ItemInventory>
+    char_inventory: Res<CharItemInventory>
 ) -> () {
     let types: [ItemType; 3] = [
         ItemType::C, ItemType::B, ItemType::A
@@ -66,10 +66,10 @@ pub fn draw_inventory_items(
         .iter()
         .for_each(|item_type| {
             let type_index = types.iter().position(|i_type| item_type == i_type).unwrap();
-            let item_count = inventory.get_item_type_count(*item_type);
+            let item_count = char_inventory.inventory.get_item_type_count(*item_type);
 
             if item_count > 0 {
-                let item: Item = inventory.get_items_of_type(*item_type)[0];
+                let item: Item = char_inventory.inventory.get_items_of_type(*item_type)[0];
                 for i in 0..item_count {
                     spawn_inventory_item(
                         &mut commands,

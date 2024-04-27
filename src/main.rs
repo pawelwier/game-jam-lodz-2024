@@ -3,13 +3,15 @@ use bevy::{prelude::*, window::WindowResolution};
 use character::{resources::CharMovement, systems::spawn_character};
 use controller::systems::{handle_add_item, handle_char_movement};
 use game::{systems::{draw_game_bg, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
-use item::{resources::ItemInventory, systems::{draw_inventory_bg, draw_inventory_items}};
+use item::{resources::CharItemInventory, systems::{draw_inventory_bg, draw_inventory_items}};
+use point_area::systems::draw_point_areas;
 
 mod game;
 mod animation;
 mod item;
 mod controller;
 mod character;
+mod point_area;
 
 fn main() {
     App::new()
@@ -18,7 +20,7 @@ fn main() {
                 .set(
                     WindowPlugin {
                         primary_window: Some(Window {
-                            title: "GAME JAM LODZ".to_string(),
+                            title: "CIEZKOSC BYTU".to_string(),
                             resizable: false,
                             resolution: WindowResolution::new(
                                 WINDOW_WIDTH,
@@ -31,11 +33,14 @@ fn main() {
                 )
         )
         .init_state::<GameState>()
-        .init_resource::<ItemInventory>()
+        .init_resource::<CharItemInventory>()
         .init_resource::<CharMovement>()
-        .add_systems(Startup, spawn_camera)
-        .add_systems(Startup, draw_inventory_bg)
-        .add_systems(Startup, spawn_character)
+        .add_systems(Startup, (
+            spawn_camera,
+            draw_inventory_bg,
+            draw_point_areas,
+            spawn_character
+        ))
         .add_systems(Update, handle_add_item.run_if(in_state(GameState::LoadInventory)))
         .add_systems(Update, draw_inventory_items)
         .add_systems(Update, (
