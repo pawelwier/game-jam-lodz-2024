@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 
+use super::CHAR_SPEED;
+
 #[derive(Resource)]
 pub struct CharMovement {
     pub state: MovementState,
-    direction: Vec3,
     speed: f32
 }
 
@@ -17,8 +18,7 @@ impl Default for CharMovement {
     fn default() -> CharMovement {
         CharMovement {
             state: MovementState::Idle,
-            speed: 400.0,
-            direction: Vec3::ZERO
+            speed: CHAR_SPEED
         }
     }
 }
@@ -34,21 +34,5 @@ impl CharMovement {
 
     pub fn set_state(&mut self, state: MovementState) -> () {
         self.state = state;
-    }
-
-    pub fn set_direction(&mut self, direction: Vec3) -> () {
-        self.direction = direction;
-    }
-
-    pub fn move_char(&mut self) -> () {
-        self.set_state(MovementState::Move);
-    }
-
-    pub fn stop_char(&mut self) -> () {
-        self.set_state(MovementState::Idle);
-    }
-
-    pub fn is_moving(&mut self) -> bool {
-        self.state == MovementState::Move
     }
 }

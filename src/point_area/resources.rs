@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::item::{components::Item, resources::ItemInventory};
 
-use super::components::{AreaId, AreaType};
+use super::{components::{AreaId, AreaType}, RELOAD_AREAS_TIMER};
 
 #[derive(Resource)]
 pub struct AreaInventories {
@@ -19,5 +19,16 @@ impl Default for AreaInventories {
                 (AreaId::TopRight, ItemInventory { items: Vec::<Item>::new()}, AreaType::Empty ),
             ]
         }
+    }
+}
+
+#[derive(Resource)]
+pub struct ReloadAreasTimer {
+    pub timer: Timer
+}
+
+impl Default for ReloadAreasTimer {
+    fn default() -> ReloadAreasTimer {
+        ReloadAreasTimer { timer: Timer::from_seconds(RELOAD_AREAS_TIMER, TimerMode::Repeating) }
     }
 }

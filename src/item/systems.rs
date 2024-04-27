@@ -2,29 +2,49 @@ use bevy::prelude::*;
 
 use crate::{point_area::{components::{Area, AreaId, AreaType}, resources::AreaInventories}, WINDOW_HEIGHT, WINDOW_WIDTH};
 
-use super::{components::{Item, ITEM_HEIGHT, ITEM_TYPES, ITEM_WIDTH}, resources::{CharItemInventory, ItemInventory, INVENTORY_BG_WIDTH}};
+use super::{components::{CharacterItem, Item, ItemType, ITEM_HEIGHT, ITEM_TYPES, ITEM_WIDTH}, resources::{CharItemInventory, ItemInventory, INVENTORY_BG_WIDTH}};
 
 pub fn spawn_inventory_item(
     commands: &mut Commands,
     asset_server: &AssetServer,
     position: (f32, f32),
     icon: String,
-    scale: f32
+    item_type: ItemType,
+    scale: f32,
+    is_char_inventory: bool
 ) -> () {
-    let icon_path = "sprites/".to_string() + &icon;
-    commands.spawn(
-        (
-            SpriteBundle {
-                texture: asset_server.load(icon_path),
-                transform: Transform { 
-                    translation: Vec3 { x: position.0, y: position.1, z: 0.0 },
-                    scale: Vec3 { x: scale, y: scale, z: 0.0 },
-                    ..Default::default()
+    let icon_path: String = "sprites/".to_string() + &icon;
+    let bundle: SpriteBundle = SpriteBundle {
+        texture: asset_server.load(icon_path),
+        transform: Transform { 
+            translation: Vec3 { x: position.0, y: position.1, z: 0.0 },
+            scale: Vec3 { x: scale, y: scale, z: 0.0 },
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    if is_char_inventory {
+        commands.spawn(
+            (
+                bundle,
+                Item {
+                    item_type
                 },
-                ..Default::default()
-            },
-        )
-    );
+                CharacterItem {}
+            )
+        );
+    } else {
+        commands.spawn(
+            (
+                bundle,
+                Item {
+                    item_type
+                }
+            )
+        );
+    }
+
 }
 
 pub fn draw_inventory_bg(
@@ -52,10 +72,10 @@ pub fn draw_inventory_bg(
 pub fn draw_all_area_inventory_items(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    area_query: Query<(&Transform, &mut Area), With<Area>>,
+    area_query: Query<(&Transform, Entity, &mut Area), With<Area>>,
     area_inventories: &ResMut<AreaInventories>
 ) -> () {
-    for (area_transform, area) in area_query.iter() {
+    for (area_transform, _, area) in area_query.iter() {
         draw_area_inventory_items(
             &mut commands,
             &asset_server,
@@ -86,7 +106,8 @@ pub fn draw_area_inventory_items(
             area_transform.translation.x - ITEM_WIDTH / 3.0,
             area_transform.translation.y
         ),
-        0.3
+        0.3,
+        false
     )
 
 }
@@ -106,7 +127,8 @@ pub fn draw_char_inventory_items(
         &asset_server,
         &char_inventory.inventory,
         row_initial_position,
-        1.0
+        1.0,
+        true
     )
 }
 
@@ -115,7 +137,8 @@ pub fn draw_inventory_items(
     asset_server: &AssetServer,
     inventory: &ItemInventory,
     row_initial_position: (f32, f32),
-    scale: f32
+    scale: f32,
+    is_char_inventory: bool
 ) -> () {
     ITEM_TYPES
         .iter()
@@ -134,9 +157,21 @@ pub fn draw_inventory_items(
                             row_initial_position.1 + ITEM_HEIGHT * 1.4 * type_index as f32 * scale
                         ),
                         item.get_icon(),
-                        scale
+                        *item_type,
+                        scale,
+                        is_char_inventory
                     )
                 }
             }
         });
+}
+
+
+pub fn despawn_inventories(
+    commands: &mut Commands,
+    area_query: Query<Entity, With<Area>>,
+) -> () {
+    for entity in area_query.iter() {
+        commands.entity(entity).despawn();
+    }
 }

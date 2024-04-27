@@ -16,7 +16,7 @@ pub enum AreaId {
     TopRight
 }
 
-#[derive(Clone, Component, Copy,Debug)]
+#[derive(Clone, Component, Copy, Debug)]
 pub struct Area {
     pub id: AreaId,
     pub area_type: AreaType,

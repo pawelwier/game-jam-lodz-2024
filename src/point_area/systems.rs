@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 use rand::{Rng, thread_rng};
 
-use crate::{character::{components::Character, CHAR_SIZE}, game::systems::objects_collide, item::{components::{Item, ITEM_TYPES}, resources::{CharItemInventory, MAX_ITEM_TYPE}, systems::draw_all_area_inventory_items}};
+use crate::{character::{components::Character, CHAR_SIZE}, game::systems::objects_collide, item::{components::{CharacterItem, Item, ITEM_TYPES}, resources::{CharItemInventory, MAX_ITEM_TYPE}, systems::draw_all_area_inventory_items}};
 
-use super::{components::{Area, AreaType}, resources::AreaInventories, AREA_POSITIONS, AREA_SIZE};
+use super::{components::{Area, AreaType}, events::AreaCaptured, resources::{AreaInventories, ReloadAreasTimer}, AREA_POSITIONS, AREA_SIZE};
 
 pub fn draw_point_areas(
     mut commands: Commands,
@@ -32,14 +32,15 @@ pub fn draw_point_areas(
 pub fn add_random_area_items(
     commands: Commands,
     asset_server: Res<AssetServer>,
-    area_query: Query<(&Transform, &mut Area), With<Area>>,
+    area_query: Query<(&Transform, Entity, &mut Area), With<Area>>,
     mut area_inventories: ResMut<AreaInventories>,
     char_inventory: ResMut<CharItemInventory>
 ) -> () {
     for i in 0..area_inventories.inventories.len() {
         area_inventories.inventories[i].1.clear_items();
         for item_type in ITEM_TYPES {
-            let num = thread_rng().gen_range(0..MAX_ITEM_TYPE);
+            let mut num = thread_rng().gen_range(0..MAX_ITEM_TYPE);
+            if num > 0 && rand::random::<f32>() < 0.6 { num -= 1 }; // To make game easier
             for _ in 0..=num {
                 area_inventories.inventories[i].1.add_item(Item { item_type });
             }
@@ -82,7 +83,8 @@ fn update_area_types(
 pub fn check_step_on_area(
     area_query: Query<(&Transform, &Area), With<Area>>,
     char_query: Query<&Transform, With<Character>>,
-    area_inventories: ResMut<AreaInventories>
+    mut area_inventories: ResMut<AreaInventories>,
+    mut captured_event_writer: EventWriter<AreaCaptured>
 ) -> () {
     let char_transform = char_query.get_single().unwrap();
 
@@ -97,14 +99,56 @@ pub fn check_step_on_area(
                 (AREA_SIZE, AREA_SIZE)
             ),
         ) {
-            let area_item = area_inventories.inventories
-                .iter()
-                .find(|a| { a.0 == area.id })
-                .unwrap();
-
-            if area_item.2 == AreaType::Available {
-                println!("{:?}", area.id);
+            for i in 0..area_inventories.inventories.len() {
+                if area_inventories.inventories[i].0 == area.id && area_inventories.inventories[i].2 == AreaType::Available {
+                    area_inventories.inventories[i].2 = AreaType::Used;
+                    area_inventories.inventories[i].1.clear_items();
+                    captured_event_writer.send(AreaCaptured { id: area.id });
+                }
             }
         }
+    }
+}
+
+pub fn handle_area_captured(
+    mut captured_event_reader: EventReader<AreaCaptured>,
+    mut commands: Commands,
+    area_query: Query<(Entity, &Area), With<Area>>,
+) -> () {
+    for event in captured_event_reader.read() {
+        for (entity, area) in area_query.iter() {
+            if area.id == event.id { commands.entity(entity).despawn(); };
+        }
+    }
+}
+
+pub fn tick_reload_areas_timer(
+    mut reload_areas_timer: ResMut<ReloadAreasTimer>,
+    time: Res<Time>
+) {
+    reload_areas_timer.timer.tick(time.delta());
+}
+
+pub fn reload_areas_over_time(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    area_query: Query<(&Transform, Entity, &mut Area), With<Area>>,
+    item_query: Query<Entity, (With<Item>, Without<CharacterItem>)>,
+    area_inventories: ResMut<AreaInventories>,
+    char_inventory: ResMut<CharItemInventory>,
+    reload_areas_timer: Res<ReloadAreasTimer>,
+) {
+    if reload_areas_timer.timer.finished() {
+        for entity in item_query.iter() {
+            commands.entity(entity).despawn();
+        }
+
+        add_random_area_items(
+            commands,
+            asset_server,
+            area_query,
+            area_inventories,
+            char_inventory
+        )
     }
 }

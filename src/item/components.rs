@@ -19,6 +19,9 @@ pub struct Item {
     pub item_type: ItemType,
 }
 
+#[derive(Component)]
+pub struct CharacterItem {}
+
 impl Item {
     pub fn get_icon(&self) -> String {
         let icon: &str =  if self.item_type == ItemType::A {
@@ -26,7 +29,7 @@ impl Item {
         } else if self.item_type == ItemType::B {
             "item_b.png"
         } else { 
-            "item_c.png" 
+            "item_c.png"
         };
 
         return icon.to_string();

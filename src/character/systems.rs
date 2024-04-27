@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use crate::{animation::{components::{AnimatedEntity, AnimationIndices, SpriteLayout}, systems::spawn_animated_entity}, game::components::GameBg};
+use crate::{animation::{components::{AnimatedEntity, AnimationIndices, SpriteLayout}, systems::spawn_animated_entity}, enemy::{components::Laser, LASER_SIZE}, game::{components::GameBg, systems::objects_collide, GameState}, item::{components::CharacterItem, resources::CharItemInventory}};
 
-use super::{components::Character, resources::MovementState, CHAR_FRAME_COUNT, CHAR_SIZE};
+use super::{components::Character, resources::{CharMovement, MovementState}, CHAR_FRAME_COUNT, CHAR_SIZE, CHAR_SPEED};
 
 fn get_char_animated_entity(
     asset_server: Res<AssetServer>,
@@ -58,4 +58,35 @@ pub fn spawn_character(
     // } else { 
         // return;
     // }   
+}
+
+pub fn set_character_speed(
+    item_inventory: Res<CharItemInventory>,
+    mut char_movement: ResMut<CharMovement>
+) -> () {
+    let item_count = item_inventory.inventory.items.len();
+
+    char_movement.set_speed(CHAR_SPEED - 30.0 * item_count as f32);
+}
+
+pub fn check_laser_char_collision(
+    laser_query: Query<&Transform, With<Laser>>,
+    char_query: Query<&Transform, With<Character>>,
+    mut app_state_next_state: ResMut<NextState<GameState>>
+) -> () {
+    let char_transform = char_query.get_single().unwrap();
+    for laser_transform in laser_query.iter() {
+        if objects_collide(
+            (
+                (char_transform.translation.x, char_transform.translation.y),
+                (CHAR_SIZE, CHAR_SIZE)
+            ),
+            (
+                (laser_transform.translation.x, laser_transform.translation.y),
+                (LASER_SIZE, LASER_SIZE)
+            )
+        ) {
+            app_state_next_state.set(GameState::GameOver);
+        }
+    }
 }

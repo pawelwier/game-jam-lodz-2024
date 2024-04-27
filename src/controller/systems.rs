@@ -28,10 +28,12 @@ pub fn handle_add_item(
     ];
 
     for (code, item_type) in input_type_map {
-        if is_key_just_pressed(&input, code)
-            && item_inventory.inventory.can_add_item_type(item_type)    
-        {
-            item_inventory.inventory.add_item(Item { item_type });
+        if is_key_just_pressed(&input, code) {
+            if item_inventory.inventory.can_add_item_type(item_type) {
+                item_inventory.inventory.add_item(Item { item_type });
+            } else {
+                // TODO: remove all items of given type
+            }
         }
     }
 
