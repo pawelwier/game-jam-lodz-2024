@@ -39,7 +39,6 @@ pub fn spawn_character(
     texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     // if let Ok(bg) = game_bg_query.get_single() {
-        println!("asd");
         spawn_animated_entity(
             commands,
             get_char_animation(

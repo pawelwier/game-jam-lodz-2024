@@ -10,6 +10,10 @@ pub enum ItemType {
     C
 }
 
+pub const ITEM_TYPES: [ItemType; 3] = [
+    ItemType::C, ItemType::B, ItemType::A
+];
+
 #[derive(Component, Copy, Clone)]
 pub struct Item {
     pub item_type: ItemType,

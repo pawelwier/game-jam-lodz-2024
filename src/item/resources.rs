@@ -4,13 +4,14 @@ use super::components::{Item, ItemType};
 
 pub const INVENTORY_BG_WIDTH: f32 = 200.0;
 pub const INVENTORY_BG_HEIGHT: f32 = 300.0;
-const MAX_ITEM_TYPE: usize = 3;
+pub const MAX_ITEM_TYPE: usize = 3;
 
 #[derive(Resource)]
 pub struct CharItemInventory {
     pub inventory: ItemInventory
 }
 
+#[derive(Clone)]
 pub struct ItemInventory {
     pub items: Vec<Item>
 }
@@ -48,5 +49,9 @@ impl ItemInventory {
 
     pub fn can_add_item_type(&self, item_type: ItemType) -> bool {
         self.get_item_type_count(item_type) < MAX_ITEM_TYPE
+    }
+
+    pub fn clear_items(&mut self) -> () {
+        self.items = vec![];
     }
 }
