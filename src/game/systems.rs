@@ -1,4 +1,4 @@
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::{app::AppExit, prelude::*, window::PrimaryWindow};
 
 use crate::{controller::utils::is_key_just_pressed, enemy::resources::LaserTimer, item::resources::INVENTORY_BG_WIDTH, point_area::{resources::ReloadAreasTimer, AREA_POSITIONS}};
 
@@ -85,4 +85,10 @@ pub fn reset_timers(
     reload_areas_timer.timer.reset();
     laser_timer.left_right_timer.reset();
     laser_timer.up_down_timer.reset();
+}
+
+pub fn exit_game(
+    mut app_exit_events: ResMut<Events<AppExit>>
+) -> () {
+    app_exit_events.send(AppExit);
 }
