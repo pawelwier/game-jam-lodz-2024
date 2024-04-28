@@ -19,4 +19,7 @@ pub struct PlayButton {}
 pub struct InventoryReadyButton {}
 
 #[derive(Component)]
-pub struct StartButton {}
+pub struct PlayAgainButton {}
+
+#[derive(Component)]
+pub struct BackToMenuButton {}

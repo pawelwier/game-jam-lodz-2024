@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 pub mod components;
-pub mod resources;
+pub mod events;
 pub mod systems;
 
 

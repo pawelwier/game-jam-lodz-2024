@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::{controller::utils::is_key_just_pressed, item::resources::INVENTORY_BG_WIDTH, point_area::AREA_POSITIONS};
+use crate::{character::components::Character, controller::utils::is_key_just_pressed, enemy::components::Laser, item::{components::Item, resources::{CharItemInventory, INVENTORY_BG_WIDTH}}, point_area::{components::{Area, AreaType}, resources::AreaInventories, AREA_POSITIONS}};
 
 use super::{components::GameBg, resources::Score, GameState, MOVE_AREA_MARGIN, WINDOW_HEIGHT, WINDOW_WIDTH};
 

@@ -15,14 +15,9 @@ use crate::{
 };
 
 use super::{
-    components::Character, 
-    resources::{
+    components::Character, resources::{
         CharMovement, MovementState
-    }, 
-    CHAR_FRAME_COUNT, 
-    CHAR_SIZE, 
-    CHAR_SPEED,
-    CHAR_SPEED_PENALTY
+    }, CHAR_FRAME_COUNT, CHAR_INIT_POS, CHAR_SIZE, CHAR_SPEED, CHAR_SPEED_PENALTY
 };
 
 fn get_char_animated_entity(
@@ -65,8 +60,8 @@ pub fn spawn_character(
             asset_server
         ),
         Vec3 { 
-            x: 300.,
-            y: 400.,
+            x: CHAR_INIT_POS.0,
+            y: CHAR_INIT_POS.1,
             z: 0. 
         },
         texture_atlas_layouts,
