@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::WindowResolution};
 use character::{resources::CharMovement, systems::{check_laser_char_collision, set_character_speed, spawn_character}};
 use controller::systems::{handle_add_item, handle_char_movement};
 use enemy::{resources::LaserTimer, systems::{move_lasers, shoot_lasers, spawn_ufos, tick_laser_timer}};
-use game::{resources::Score, systems::{check_game_completed, draw_game_bg, handle_get_ready, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
+use game::{resources::Score, systems::{check_game_completed, draw_game_bg, handle_get_ready, reset_timers, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 use item::{resources::CharItemInventory, systems::{draw_char_inventory_items, draw_inventory_bg}};
 use menu::{events::FinalMenuClosed, systems::{check_despawn_final_menu, despawn_get_ready_info, despawn_inventory_info, despawn_main_menu, react_to_back_to_menu_button, react_to_play_button, react_to_restart_button, spawn_endgame_menu, spawn_get_ready_info, spawn_inventory_info, spawn_main_menu}};
 use point_area::{
@@ -30,7 +30,7 @@ fn main() {
                 .set(
                     WindowPlugin {
                         primary_window: Some(Window {
-                            title: "CIEZKOSC BYTU".to_string(),
+                            title: "TABULA RUNNER".to_string(),
                             resizable: false,
                             resolution: WindowResolution::new(
                                 WINDOW_WIDTH,
@@ -75,7 +75,8 @@ fn main() {
             add_random_area_items,
             set_character_speed,
             spawn_character,
-            spawn_ufos
+            spawn_ufos,
+            reset_timers
         ))
         .add_systems(Update, (
             handle_char_movement,
@@ -90,11 +91,14 @@ fn main() {
             check_laser_char_collision,
             check_game_completed
         ).run_if(in_state(GameState::Play)))
-        .add_systems(OnEnter(GameState::GameOver), (
-            spawn_endgame_menu
-        ))
+        // TODO: add substate for finished
+        .add_systems(OnEnter(GameState::GameOver), spawn_endgame_menu)
+        .add_systems(OnEnter(GameState::Completed), spawn_endgame_menu)
         .add_systems(Update, (
             /* react_to_restart_button, */ react_to_back_to_menu_button, check_despawn_final_menu
         ).run_if(in_state(GameState::GameOver)))
+        .add_systems(Update, (
+            /* react_to_restart_button, */ react_to_back_to_menu_button, check_despawn_final_menu
+        ).run_if(in_state(GameState::Completed)))
         .run();
 }

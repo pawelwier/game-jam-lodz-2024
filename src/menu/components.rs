@@ -16,9 +16,6 @@ pub struct FinalMenu {}
 pub struct PlayButton {}
 
 #[derive(Component)]
-pub struct InventoryReadyButton {}
-
-#[derive(Component)]
 pub struct PlayAgainButton {}
 
 #[derive(Component)]

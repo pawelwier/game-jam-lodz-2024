@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{character::components::Character, enemy::components::Laser, game::{resources::Score, GameState}, item::{components::Item, resources::CharItemInventory}, point_area::{components::{Area, AreaType}, resources::AreaInventories}};
 
-use super::{components::{BackToMenuButton, FinalMenu, InventoryInfo, InventoryReadyButton, MainMenu, PlayAgainButton, PlayButton}, events::FinalMenuClosed, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR};
+use super::{components::{BackToMenuButton, FinalMenu, InventoryInfo, MainMenu, PlayAgainButton, PlayButton}, events::FinalMenuClosed, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR};
 
 // TODO: add some order, refactor
 
@@ -50,7 +50,7 @@ pub fn spawn_main_menu(
             TextBundle {
                 text: Text {
                     sections: vec![
-                        draw_text(&asset_server, "PLAY PLAY PLAY PLAY".to_string(), 100., Color::DARK_GRAY),
+                        draw_text(&asset_server, "TABULA RUNNER".to_string(), 90., Color::DARK_GRAY),
                     ],
                     justify: JustifyText::Center,
                     ..default()
@@ -107,7 +107,7 @@ pub fn spawn_inventory_info(
     commands.spawn(
         (
             NodeBundle {
-                background_color: BackgroundColor(Color::AZURE),
+                background_color: BackgroundColor(Color::WHITE),
                 style: Style {
                     flex_direction: FlexDirection::Column,
                     justify_content: JustifyContent::Center,
@@ -115,10 +115,10 @@ pub fn spawn_inventory_info(
                     width: Val::Percent(75.),
                     height: Val::Percent(100.),
                     padding: UiRect {
-                        left: Val::Percent(3.),
-                        right: Val::Percent(4.),
-                        top: Val::Percent(3.),
-                        bottom: Val::Percent(3.)
+                        left: Val::Percent(2.),
+                        right: Val::Percent(2.),
+                        top: Val::Percent(2.),
+                        bottom: Val::Percent(2.)
                     },
                     row_gap: Val::Px(50.),
                     ..Default::default()
@@ -133,7 +133,7 @@ pub fn spawn_inventory_info(
             TextBundle {
                 text: Text {
                     sections: vec![
-                        draw_text(&asset_server, "Let's make your tabula rasa not so rasa any more.".to_string(), 40., Color::DARK_GRAY),
+                        draw_text(&asset_server, "What you see on the right is your tabula rasa.".to_string(), 35., Color::DARK_GRAY),
                     ],
                     justify: JustifyText::Center,
                     ..default()
@@ -145,7 +145,7 @@ pub fn spawn_inventory_info(
             TextBundle {
                 text: Text {
                     sections: vec![
-                        draw_text(&asset_server, "The more items you have the more fields you can mark.".to_string(), 40., Color::DARK_GRAY),
+                        draw_text(&asset_server, "Let's make your tabula rasa not so rasa any more.".to_string(), 35., Color::DARK_GRAY),
                     ],
                     justify: JustifyText::Center,
                     ..default()
@@ -157,7 +157,7 @@ pub fn spawn_inventory_info(
             TextBundle {
                 text: Text {
                     sections: vec![
-                        draw_text(&asset_server, "But the more items you have the slower you run.".to_string(), 40., Color::DARK_GRAY),
+                        draw_text(&asset_server, "The more items you have the more fields you can mark.".to_string(), 35., Color::DARK_GRAY),
                     ],
                     justify: JustifyText::Center,
                     ..default()
@@ -169,7 +169,7 @@ pub fn spawn_inventory_info(
             TextBundle {
                 text: Text {
                     sections: vec![
-                        draw_text(&asset_server, "You mark a field by running on it. You need at least as many items of each kind as there are on the field.".to_string(), 40., Color::DARK_GRAY),
+                        draw_text(&asset_server, "But the more items you have the slower you run.".to_string(), 35., Color::DARK_GRAY),
                     ],
                     justify: JustifyText::Center,
                     ..default()
@@ -181,7 +181,19 @@ pub fn spawn_inventory_info(
             TextBundle {
                 text: Text {
                     sections: vec![
-                        draw_text(&asset_server, "Press 1 2 3 to fill in your inventory items (max. 3 each).".to_string(), 60., Color::DARK_GRAY),
+                        draw_text(&asset_server, "You mark a field by running on it. You need at least as many items of each kind as there are on the field.".to_string(), 35., Color::DARK_GRAY),
+                    ],
+                    justify: JustifyText::Center,
+                    ..default()
+                },
+                ..Default::default()
+            }
+        );
+        parent.spawn(
+            TextBundle {
+                text: Text {
+                    sections: vec![
+                        draw_text(&asset_server, "Press 1 2 3 to fill in your inventory items (max. 3 each).".to_string(), 50., Color::DARK_GRAY),
                     ],
                     justify: JustifyText::Center,
                     ..default()
@@ -382,7 +394,6 @@ pub fn react_to_restart_button(
 
 pub fn react_to_back_to_menu_button(
     mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<BackToMenuButton>)>,
-    mut app_state_next_state: ResMut<NextState<GameState>>,
     mut final_menu_event_writer: EventWriter<FinalMenuClosed>,
     mut commands: Commands,
     final_menu_query: Query<Entity, With<FinalMenu>>
@@ -394,7 +405,6 @@ pub fn react_to_back_to_menu_button(
                     commands.entity(menu_entity).despawn_recursive();
                     final_menu_event_writer.send(FinalMenuClosed {});
                 }
-                app_state_next_state.set(GameState::MainMenu);
             },
             Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
             Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
@@ -438,6 +448,7 @@ pub fn check_despawn_final_menu(
     mut char_inventory: ResMut<CharItemInventory>,
     mut area_inventories: ResMut<AreaInventories>,
     mut score: ResMut<Score>,
+    mut app_state_next_state: ResMut<NextState<GameState>>
 ) {
     for _ in final_menu_event_reader.read() {
         for entity in object_query.iter_mut() {
@@ -452,5 +463,8 @@ pub fn check_despawn_final_menu(
             area_inventories.inventories[i].1.items = Vec::<Item>::new();
             area_inventories.inventories[i].2 = AreaType::Empty;
         }
+
+        app_state_next_state.set(GameState::MainMenu);
+
     }
 }

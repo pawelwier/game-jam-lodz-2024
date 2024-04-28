@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::{character::components::Character, controller::utils::is_key_just_pressed, enemy::components::Laser, item::{components::Item, resources::{CharItemInventory, INVENTORY_BG_WIDTH}}, point_area::{components::{Area, AreaType}, resources::AreaInventories, AREA_POSITIONS}};
+use crate::{controller::utils::is_key_just_pressed, enemy::resources::LaserTimer, item::resources::INVENTORY_BG_WIDTH, point_area::{resources::ReloadAreasTimer, AREA_POSITIONS}};
 
 use super::{components::GameBg, resources::Score, GameState, MOVE_AREA_MARGIN, WINDOW_HEIGHT, WINDOW_WIDTH};
 
@@ -76,4 +76,13 @@ pub fn check_game_completed(
     if score.points == AREA_POSITIONS.len() {
         app_state_next_state.set(GameState::Completed);
     }
+}
+
+pub fn reset_timers(
+    mut reload_areas_timer: ResMut<ReloadAreasTimer>,
+    mut laser_timer: ResMut<LaserTimer>
+) -> () {
+    reload_areas_timer.timer.reset();
+    laser_timer.left_right_timer.reset();
+    laser_timer.up_down_timer.reset();
 }
