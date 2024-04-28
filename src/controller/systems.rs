@@ -46,10 +46,10 @@ fn limit_movement(
     char_position: (f32, f32),
     direction: Vec3
 ) -> bool {
-    let left_border = char_position.0 < MOVE_AREA_POS.0 + CHAR_SIZE / 2.0 && direction.x < 0.0;
-    let right_border = char_position.0 > MOVE_AREA_POS.0 + MOVE_AREA_SIZE.0 - CHAR_SIZE / 2.0 && direction.x > 0.0;
-    let bottom_border = char_position.1 < MOVE_AREA_POS.1 + CHAR_SIZE / 2.0 && direction.y < 0.0;
-    let top_border = char_position.1 > MOVE_AREA_POS.1 + MOVE_AREA_SIZE.1 - CHAR_SIZE / 2.0 && direction.y > 0.0;
+    let left_border = char_position.0 < MOVE_AREA_POS.0 + CHAR_SIZE / 2. && direction.x < 0.;
+    let right_border = char_position.0 > MOVE_AREA_POS.0 + MOVE_AREA_SIZE.0 - CHAR_SIZE / 2. && direction.x > 0.;
+    let bottom_border = char_position.1 < MOVE_AREA_POS.1 + CHAR_SIZE / 2. && direction.y < 0.;
+    let top_border = char_position.1 > MOVE_AREA_POS.1 + MOVE_AREA_SIZE.1 - CHAR_SIZE / 2. && direction.y > 0.;
 
     left_border || right_border || bottom_border || top_border
 }
@@ -65,16 +65,16 @@ pub fn handle_char_movement(
     if let Ok(
         (mut char_transform, mut image, mut atlas)
     ) = char_query.get_single_mut() {
-        let (mut x, mut y): (f32, f32) = (0.0, 0.0);
+        let (mut x, mut y): (f32, f32) = (0., 0.);
         let mut direction: Vec3 = Vec3::ZERO;
     
-        if is_key_pressed(&input, KeyCode::ArrowLeft) { x = -1.0 }
-        else if is_key_pressed(&input, KeyCode::ArrowRight) { x = 1.0 }
-        if is_key_pressed(&input, KeyCode::ArrowDown) { y = -1.0 }
-        else if is_key_pressed(&input, KeyCode::ArrowUp) { y = 1.0 }
+        if is_key_pressed(&input, KeyCode::ArrowLeft) { x = -1. }
+        else if is_key_pressed(&input, KeyCode::ArrowRight) { x = 1. }
+        if is_key_pressed(&input, KeyCode::ArrowDown) { y = -1. }
+        else if is_key_pressed(&input, KeyCode::ArrowUp) { y = 1. }
     
-        if x != 0.0 || y != 0.0 {
-            direction += Vec3::new(x, y, 0.0);
+        if x != 0. || y != 0. {
+            direction += Vec3::new(x, y, 0.);
             direction = direction.normalize();
             movement.set_state(MovementState::Move);
         } else {
@@ -91,7 +91,7 @@ pub fn handle_char_movement(
         ) { 
             movement.set_state(MovementState::Idle);
         } else {
-            if x < 0.0 {
+            if x < 0. {
                 char_transform.rotation = Quat::from_rotation_y(std::f32::consts::PI);
             } else {
                 char_transform.rotation = Quat::default();

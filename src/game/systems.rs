@@ -12,7 +12,7 @@ pub fn spawn_camera(
 
     commands.spawn(
         Camera2dBundle {
-            transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
+            transform: Transform::from_xyz(window.width() / 2., window.height() / 2., 0.),
             ..Default::default()
         }
     );
@@ -28,9 +28,9 @@ pub fn draw_game_bg(
                 texture: asset_server.load("sprites/game_bg.png"),
                 transform: Transform { 
                     translation: Vec3 { 
-                        x: WINDOW_WIDTH / 2.0 - INVENTORY_BG_WIDTH / 2.0 - MOVE_AREA_MARGIN / 2.0,
-                        y: WINDOW_HEIGHT / 2.0, 
-                        z: 0.0
+                        x: WINDOW_WIDTH / 2. - INVENTORY_BG_WIDTH / 2. - MOVE_AREA_MARGIN / 2.,
+                        y: WINDOW_HEIGHT / 2., 
+                        z: 0.
                     },
                     ..Default::default()
                 },
@@ -63,10 +63,10 @@ pub fn objects_collide(
     let (pos_one, size_one) = object_one;
     let (pos_two, size_two) = object_two;
 
-    (pos_one.0 + size_one.0 / 2.0 > pos_two.0 - size_two.0 / 2.0)
-        && (pos_one.0 - size_one.0 / 2.0 < pos_two.0 + size_two.0 / 2.0)
-            && (pos_one.1 + size_one.1 / 2.0 > pos_two.1 - size_two.1 / 2.0)
-                && (pos_one.1 - size_one.1 / 2.0 < pos_two.1 + size_two.1 / 2.0)
+    (pos_one.0 + size_one.0 / 2. > pos_two.0 - size_two.0 / 2.)
+        && (pos_one.0 - size_one.0 / 2. < pos_two.0 + size_two.0 / 2.)
+            && (pos_one.1 + size_one.1 / 2. > pos_two.1 - size_two.1 / 2.)
+                && (pos_one.1 - size_one.1 / 2. < pos_two.1 + size_two.1 / 2.)
 }
 
 pub fn check_game_completed(

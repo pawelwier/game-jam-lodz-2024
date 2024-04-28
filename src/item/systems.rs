@@ -40,8 +40,8 @@ pub fn spawn_inventory_item(
     let bundle: SpriteBundle = SpriteBundle {
         texture: asset_server.load(icon_path),
         transform: Transform { 
-            translation: Vec3 { x: position.0, y: position.1, z: 0.0 },
-            scale: Vec3 { x: scale, y: scale, z: 0.0 },
+            translation: Vec3 { x: position.0, y: position.1, z: 0. },
+            scale: Vec3 { x: scale, y: scale, z: 0. },
             ..Default::default()
         },
         ..Default::default()
@@ -80,9 +80,9 @@ pub fn draw_inventory_bg(
                 texture: asset_server.load("sprites/inventory_bg.png"),
                 transform: Transform { 
                     translation: Vec3 { 
-                        x: WINDOW_WIDTH - INVENTORY_BG_WIDTH / 2.0 - 50.0,
-                        y: WINDOW_HEIGHT / 2.0, 
-                        z: 0.0
+                        x: WINDOW_WIDTH - INVENTORY_BG_WIDTH / 2. - 50.,
+                        y: WINDOW_HEIGHT / 2., 
+                        z: 0.
                     },
                     ..Default::default()
                 },
@@ -126,8 +126,8 @@ pub fn draw_area_inventory_items(
         asset_server,
         &inventory.1,
         (
-            area_transform.translation.x - ITEM_WIDTH / 2.0,
-            area_transform.translation.y - ITEM_HEIGHT / 2.0
+            area_transform.translation.x - ITEM_WIDTH / 2.,
+            area_transform.translation.y - ITEM_HEIGHT / 2.
         ),
         0.4,
         false
@@ -142,7 +142,7 @@ pub fn draw_char_inventory_items(
 ) -> () {
     let row_initial_position: (f32, f32) = (
         WINDOW_WIDTH - INVENTORY_BG_WIDTH,
-        WINDOW_HEIGHT / 2.0
+        WINDOW_HEIGHT / 2.
     );
 
     draw_inventory_items(
@@ -150,7 +150,7 @@ pub fn draw_char_inventory_items(
         &asset_server,
         &char_inventory.inventory,
         row_initial_position,
-        1.0,
+        1.,
         true
     )
 }

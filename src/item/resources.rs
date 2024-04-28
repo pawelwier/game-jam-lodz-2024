@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::components::{Item, ItemType};
 
-pub const INVENTORY_BG_WIDTH: f32 = 200.0;
+pub const INVENTORY_BG_WIDTH: f32 = 200.;
 pub const MAX_ITEM_TYPE: usize = 3;
 
 #[derive(Resource)]

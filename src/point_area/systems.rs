@@ -15,7 +15,7 @@ pub fn draw_point_areas(
                 SpriteBundle {
                     texture: asset_server.load("sprites/area_white.png"),
                     transform: Transform { 
-                        translation: Vec3 { x, y, z: 0.0 },
+                        translation: Vec3 { x, y, z: 0. },
                         ..Default::default()
                     },
                     ..Default::default()

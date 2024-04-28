@@ -65,9 +65,9 @@ pub fn spawn_character(
             asset_server
         ),
         Vec3 { 
-            x: 300.0,
-            y: 400.0,
-            z: 0.0 
+            x: 300.,
+            y: 400.,
+            z: 0. 
         },
         texture_atlas_layouts,
         Character {}

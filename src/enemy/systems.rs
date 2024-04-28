@@ -22,8 +22,8 @@ pub fn spawn_ufos(
                 SpriteBundle {
                     texture: asset_server.load("sprites/ufo.png"),
                     transform: Transform { 
-                        translation: Vec3 { x, y, z: 0.0 },
-                        scale: Vec3 { x: 0.6, y: 0.6, z: 0.0 },
+                        translation: Vec3 { x, y, z: 0. },
+                        scale: Vec3 { x: 0.6, y: 0.6, z: 0. },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -51,7 +51,7 @@ pub fn shoot_lasers(
                 SpriteBundle {
                     texture: asset_server.load("sprites/laser.png"),
                     transform: Transform { 
-                        translation: Vec3 { x: left_x, y: left_y, z: 0.0 },
+                        translation: Vec3 { x: left_x, y: left_y, z: 0. },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -68,7 +68,7 @@ pub fn shoot_lasers(
                 SpriteBundle {
                     texture: asset_server.load("sprites/laser.png"),
                     transform: Transform { 
-                        translation: Vec3 { x: right_x, y: right_y, z: 0.0 },
+                        translation: Vec3 { x: right_x, y: right_y, z: 0. },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -90,7 +90,7 @@ pub fn shoot_lasers(
                 SpriteBundle {
                     texture: asset_server.load("sprites/laser.png"),
                     transform: Transform { 
-                        translation: Vec3 { x: top_x, y: top_y, z: 0.0 },
+                        translation: Vec3 { x: top_x, y: top_y, z: 0. },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -107,7 +107,7 @@ pub fn shoot_lasers(
                 SpriteBundle {
                     texture: asset_server.load("sprites/laser.png"),
                     transform: Transform { 
-                        translation: Vec3 { x: bottom_x, y: bottom_y, z: 0.0 },
+                        translation: Vec3 { x: bottom_x, y: bottom_y, z: 0. },
                         ..Default::default()
                     },
                     ..Default::default()
@@ -128,7 +128,7 @@ pub fn move_lasers(
 ) -> () {
     for (mut transform, entity, laser) in laser_query.iter_mut() {
 
-        let mut direction = Vec3::new(laser.direction_x, laser.direction_y, 0.0);
+        let mut direction = Vec3::new(laser.direction_x, laser.direction_y, 0.);
         direction = direction.normalize();
         transform.translation += direction * LASER_SPEED * time.delta_seconds();
 
