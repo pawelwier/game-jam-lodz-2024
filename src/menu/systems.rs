@@ -1,8 +1,8 @@
-use bevy::{app::AppExit, prelude::*};
+use bevy::prelude::*;
 
 use crate::{character::components::Character, enemy::components::Laser, game::{resources::Score, GameState}, item::{components::Item, resources::CharItemInventory}, point_area::{components::{Area, AreaType}, resources::AreaInventories}};
 
-use super::{components::{BackToMenuButton, ExitButton, FinalMenu, InventoryInfo, MainMenu, PlayAgainButton, PlayButton}, events::FinalMenuClosed, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR};
+use super::{components::{BackToMenuButton, /*ExitButton,*/ FinalMenu, InventoryInfo, MainMenu, PlayButton}, events::FinalMenuClosed, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR};
 
 // TODO: add some order, refactor
 
@@ -85,33 +85,33 @@ pub fn spawn_main_menu(
                 ..Default::default()
             });
         });
-        parent.spawn(
-            (
-                ButtonBundle {
-                    style: Style {
-                        flex_direction: FlexDirection::Row,
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        width: Val::Px(400.),
-                        height: Val::Px(100.),
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                },
-                ExitButton {}
-            )
-        ).with_children(|parent| {
-            parent.spawn(TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "EXIT".to_string(), 80., Color::WHITE),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            });
-        });
+        // parent.spawn(
+        //     (
+        //         ButtonBundle {
+        //             style: Style {
+        //                 flex_direction: FlexDirection::Row,
+        //                 justify_content: JustifyContent::Center,
+        //                 align_items: AlignItems::Center,
+        //                 width: Val::Px(400.),
+        //                 height: Val::Px(100.),
+        //                 ..Default::default()
+        //             },
+        //             ..Default::default()
+        //         },
+        //         ExitButton {}
+        //     )
+        // ).with_children(|parent| {
+        //     parent.spawn(TextBundle {
+        //         text: Text {
+        //             sections: vec![
+        //                 draw_text(&asset_server, "EXIT".to_string(), 80., Color::WHITE),
+        //             ],
+        //             justify: JustifyText::Center,
+        //             ..default()
+        //         },
+        //         ..Default::default()
+        //     });
+        // });
         // parent.spawn(
         //     TextBundle {
         //         text: Text {
@@ -248,7 +248,7 @@ pub fn spawn_get_ready_info(
     commands.spawn(
         (
             NodeBundle {
-                background_color: BackgroundColor(Color::AZURE),
+                background_color: BackgroundColor(Color::WHITE),
                 style: Style {
                     flex_direction: FlexDirection::Column,
                     justify_content: JustifyContent::Center,
@@ -304,7 +304,7 @@ pub fn spawn_endgame_menu(
     commands.spawn(
         (
             NodeBundle {
-                background_color: BackgroundColor(Color::AZURE),
+                background_color: BackgroundColor(Color::WHITE),
                 style: Style {
                     flex_direction: FlexDirection::Column,
                     justify_content: JustifyContent::Center,
@@ -402,35 +402,35 @@ pub fn react_to_play_button(
     }
 }
 
-pub fn react_to_exit_button(
-    mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<ExitButton>)>,
-    mut app_exit_events: ResMut<Events<AppExit>>
-) {
-    if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
-        match *interaction {
-            Interaction::Pressed => { app_exit_events.send(AppExit); },
-            Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
-            Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
-        }
-    }
-}
+// pub fn react_to_exit_button(
+//     mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<ExitButton>)>,
+//     mut app_exit_events: ResMut<Events<AppExit>>
+// ) {
+//     if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
+//         match *interaction {
+//             Interaction::Pressed => { app_exit_events.send(AppExit); },
+//             Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
+//             Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
+//         }
+//     }
+// }
 
-pub fn react_to_restart_button(
-    mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<PlayAgainButton>)>,
-    mut app_state_next_state: ResMut<NextState<GameState>>,
-    mut final_menu_event_writer: EventWriter<FinalMenuClosed>
-) {
-    if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
-        match *interaction {
-            Interaction::Pressed => { 
-                app_state_next_state.set(GameState::LoadInventory); 
-                final_menu_event_writer.send(FinalMenuClosed {});
-            },
-            Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
-            Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
-        }
-    }
-}
+// pub fn react_to_restart_button(
+//     mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<PlayAgainButton>)>,
+//     mut app_state_next_state: ResMut<NextState<GameState>>,
+//     mut final_menu_event_writer: EventWriter<FinalMenuClosed>
+// ) {
+//     if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
+//         match *interaction {
+//             Interaction::Pressed => { 
+//                 app_state_next_state.set(GameState::LoadInventory); 
+//                 final_menu_event_writer.send(FinalMenuClosed {});
+//             },
+//             Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
+//             Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
+//         }
+//     }
+// }
 
 pub fn react_to_back_to_menu_button(
     mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<BackToMenuButton>)>,

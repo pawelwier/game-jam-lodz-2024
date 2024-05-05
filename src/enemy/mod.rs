@@ -6,7 +6,7 @@ pub mod components;
 pub mod resources;
 pub mod systems;
 
-pub const LASER_SPEED: f32 = 300.;
+pub const LASER_SPEED: f32 = 330.;
 pub const LASER_SIZE: f32 = 14.0;
 
 const UP_DOWN_TIMER: f32 = 2.6;

@@ -1,11 +1,13 @@
 use animation::systems::animate_sprites;
-use bevy::{prelude::*, window::WindowResolution};
+use bevy::{asset::AssetMetaCheck, prelude::*, window::WindowResolution};
 use character::{resources::CharMovement, systems::{check_laser_char_collision, set_character_speed, spawn_character}};
 use controller::systems::{handle_add_item, handle_char_movement};
 use enemy::{resources::LaserTimer, systems::{move_lasers, shoot_lasers, spawn_ufos, tick_laser_timer}};
 use game::{resources::Score, systems::{check_game_completed, draw_game_bg, handle_get_ready, reset_timers, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 use item::{resources::CharItemInventory, systems::{draw_char_inventory_items, draw_inventory_bg}};
-use menu::{events::FinalMenuClosed, systems::{check_despawn_final_menu, despawn_get_ready_info, despawn_inventory_info, despawn_main_menu, react_to_back_to_menu_button, react_to_exit_button, react_to_play_button, react_to_restart_button, spawn_endgame_menu, spawn_get_ready_info, spawn_inventory_info, spawn_main_menu}};
+use menu::{events::FinalMenuClosed, systems::{
+    check_despawn_final_menu, despawn_get_ready_info, despawn_inventory_info, despawn_main_menu, react_to_back_to_menu_button, /* react_to_exit_button, */ react_to_play_button /*, react_to_restart_button*/, spawn_endgame_menu, spawn_get_ready_info, spawn_inventory_info, spawn_main_menu
+}};
 use point_area::{
     events::AreaCaptured, 
     resources::{AreaInventories, ReloadAreasTimer}, 
@@ -25,6 +27,7 @@ mod menu;
 
 fn main() {
     App::new()
+        .insert_resource(AssetMetaCheck::Never)
         .add_plugins(
             DefaultPlugins
                 .set(
@@ -63,7 +66,7 @@ fn main() {
             despawn_main_menu, spawn_inventory_info
         ))
         .add_systems(Update, (
-            react_to_play_button, react_to_exit_button
+            react_to_play_button /* ,  react_to_exit_button */
         ).run_if(in_state(GameState::MainMenu)))
         .add_systems(Update, (
                 handle_add_item, draw_char_inventory_items
