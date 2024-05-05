@@ -2,26 +2,9 @@ use bevy::prelude::*;
 
 use crate::{character::components::Character, enemy::components::Laser, game::{resources::Score, GameState}, item::{components::Item, resources::CharItemInventory}, point_area::{components::{Area, AreaType}, resources::AreaInventories}};
 
-use super::{components::{BackToMenuButton, /*ExitButton,*/ FinalMenu, InventoryInfo, MainMenu, PlayButton}, events::FinalMenuClosed, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR};
+use super::{components::{BackToMenuButton, FinalMenu, InventoryInfo, MainMenu, PlayButton}, events::FinalMenuClosed, helpers::{despawn_component, draw_text, get_get_ready_texts, get_menu_texts, spawn_text_bundle}, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR};
 
 // TODO: add some order, refactor
-
-fn draw_text(
-    asset_server: &AssetServer,
-    text: String,
-    font_size: f32,
-    color: Color
-) -> TextSection {
-    TextSection::new(
-        text,
-        TextStyle {
-            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-            color,
-            font_size,
-            ..default()
-        },
-    )
-}
 
 pub fn spawn_main_menu(
     mut commands: Commands,
@@ -46,17 +29,12 @@ pub fn spawn_main_menu(
         )
     )
     .with_children(|parent| {
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "TABULA RUNNER".to_string(), 90., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
+        spawn_text_bundle(
+            parent,
+            &asset_server,
+            "TABULA RUNNER".to_string(),
+            90.,
+            Color::DARK_GRAY
         );
         parent.spawn(
             (
@@ -73,45 +51,15 @@ pub fn spawn_main_menu(
                 },
                 PlayButton {}
             )
-        ).with_children(|parent| {
-            parent.spawn(TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "PLAY".to_string(), 80., Color::WHITE),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            });
+        ).with_children(|parent: &mut ChildBuilder| {
+            spawn_text_bundle(
+                parent,
+                &asset_server,
+                "PLAY".to_string(),
+                80.,
+                Color::WHITE
+            );
         });
-        // parent.spawn(
-        //     (
-        //         ButtonBundle {
-        //             style: Style {
-        //                 flex_direction: FlexDirection::Row,
-        //                 justify_content: JustifyContent::Center,
-        //                 align_items: AlignItems::Center,
-        //                 width: Val::Px(400.),
-        //                 height: Val::Px(100.),
-        //                 ..Default::default()
-        //             },
-        //             ..Default::default()
-        //         },
-        //         ExitButton {}
-        //     )
-        // ).with_children(|parent| {
-        //     parent.spawn(TextBundle {
-        //         text: Text {
-        //             sections: vec![
-        //                 draw_text(&asset_server, "EXIT".to_string(), 80., Color::WHITE),
-        //             ],
-        //             justify: JustifyText::Center,
-        //             ..default()
-        //         },
-        //         ..Default::default()
-        //     });
-        // });
         // parent.spawn(
         //     TextBundle {
         //         text: Text {
@@ -156,78 +104,15 @@ pub fn spawn_inventory_info(
         )
     )
     .with_children(|parent| {
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "What you see on the right is your tabula rasa.".to_string(), 35., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "Let's make your tabula rasa not so rasa any more.".to_string(), 35., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "The more items you have the more fields you can mark.".to_string(), 35., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "But the more items you have the slower you run.".to_string(), 35., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "You mark a field by running on it. You need at least as many items of each kind as there are on the field.".to_string(), 35., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "Press 1 2 3 to fill in your inventory items (max. 3 each).".to_string(), 50., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
+        for (text, font_size) in get_menu_texts() {
+            spawn_text_bundle(
+                parent,
+                &asset_server,
+                text,
+                font_size,
+                Color::DARK_GRAY
+            )
+        };
         parent.spawn(
             ImageBundle {
                 image: UiImage { 
@@ -264,30 +149,15 @@ pub fn spawn_get_ready_info(
         )
     )
     .with_children(|parent| {
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "Use arrows to move. Watch out for the lasers.".to_string(), 50., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "Press ENTER when ready. Good luck!".to_string(), 50., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
+        for (text, font_size) in get_get_ready_texts() {
+            spawn_text_bundle(
+                parent,
+                &asset_server,
+                text,
+                font_size,
+                Color::DARK_GRAY
+            )
+        }
     });    
 }
 
@@ -320,18 +190,7 @@ pub fn spawn_endgame_menu(
         )
     )
     .with_children(|parent| {
-        parent.spawn(
-            TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, endgame_text, 100., Color::DARK_GRAY),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            }
-        );
+        spawn_text_bundle(parent, &asset_server, endgame_text, 100., Color::DARK_GRAY);
         // parent.spawn(
         //     (
         //         ButtonBundle {
@@ -375,16 +234,7 @@ pub fn spawn_endgame_menu(
                 BackToMenuButton {}
             )
         ).with_children(|parent| {
-            parent.spawn(TextBundle {
-                text: Text {
-                    sections: vec![
-                        draw_text(&asset_server, "BACK TO MENU".to_string(), 80., Color::WHITE),
-                    ],
-                    justify: JustifyText::Center,
-                    ..default()
-                },
-                ..Default::default()
-            });
+            spawn_text_bundle(parent, &asset_server, "BACK TO MENU".to_string(), 80., Color::WHITE)
         });
     });
 }
@@ -401,19 +251,6 @@ pub fn react_to_play_button(
         }
     }
 }
-
-// pub fn react_to_exit_button(
-//     mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<ExitButton>)>,
-//     mut app_exit_events: ResMut<Events<AppExit>>
-// ) {
-//     if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
-//         match *interaction {
-//             Interaction::Pressed => { app_exit_events.send(AppExit); },
-//             Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
-//             Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
-//         }
-//     }
-// }
 
 // pub fn react_to_restart_button(
 //     mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<PlayAgainButton>)>,
@@ -456,27 +293,21 @@ pub fn despawn_main_menu(
     mut commands: Commands,
     main_menu_query: Query<Entity, With<MainMenu>>
 ) {
-    if let Ok(menu_entity) = main_menu_query.get_single() {
-        commands.entity(menu_entity).despawn_recursive();
-    }
+    despawn_component(&mut commands, main_menu_query)
 }
 
 pub fn despawn_inventory_info(
     mut commands: Commands,
     inventory_info_query: Query<Entity, With<InventoryInfo>>
 ) {
-    if let Ok(menu_entity) = inventory_info_query.get_single() {
-        commands.entity(menu_entity).despawn_recursive();
-    }
+    despawn_component(&mut commands, inventory_info_query)
 }
 
 pub fn despawn_get_ready_info(
     mut commands: Commands,
     get_ready_info_query: Query<Entity, With<InventoryInfo>>
 ) {
-    if let Ok(menu_entity) = get_ready_info_query.get_single() {
-        commands.entity(menu_entity).despawn_recursive();
-    }
+    despawn_component(&mut commands, get_ready_info_query);
 }
 
 pub fn check_despawn_final_menu(
