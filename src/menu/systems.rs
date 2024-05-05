@@ -1,10 +1,34 @@
 use bevy::prelude::*;
 
-use crate::{character::components::Character, enemy::components::Laser, game::{resources::Score, GameState}, item::{components::Item, resources::CharItemInventory}, point_area::{components::{Area, AreaType}, resources::AreaInventories}};
+use crate::{
+    character::components::Character, 
+    enemy::components::Laser,
+    game::{
+        resources::Score,
+        GameState
+    }, 
+    item::{
+        components::Item,
+        resources::CharItemInventory
+    }, 
+    point_area::{
+        components::{
+            Area, 
+            AreaType
+        }, 
+        resources::AreaInventories
+    }
+};
 
-use super::{components::{BackToMenuButton, FinalMenu, InventoryInfo, MainMenu, PlayButton}, events::FinalMenuClosed, helpers::{despawn_component, draw_text, get_get_ready_texts, get_menu_texts, spawn_text_bundle}, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR};
-
-// TODO: add some order, refactor
+use super::{
+    components::{
+        BackToMenuButton, FinalMenu, InventoryInfo, MainMenu, PlayAgainButton, PlayButton
+    },
+    events::FinalMenuClosed,
+    helpers::{
+        despawn_component, get_endgame_text, get_get_ready_texts, get_menu_button_bundle, get_menu_texts, handle_button_hover, handle_button_none, react_to_endgame_menu_button, spawn_text_bundle
+    }
+};
 
 pub fn spawn_main_menu(
     mut commands: Commands,
@@ -166,11 +190,7 @@ pub fn spawn_endgame_menu(
     asset_server: Res<AssetServer>,
     game_state: Res<State<GameState>>
 ) -> () {
-    let endgame_text: String = if *game_state.get() == GameState::GameOver {
-        "GAME OVER".to_string()
-    } else {
-        "CONGRATULATIONS".to_string()
-    };
+    let endgame_text: String = get_endgame_text(&game_state);
     commands.spawn(
         (
             NodeBundle {
@@ -191,48 +211,13 @@ pub fn spawn_endgame_menu(
     )
     .with_children(|parent| {
         spawn_text_bundle(parent, &asset_server, endgame_text, 100., Color::DARK_GRAY);
-        // parent.spawn(
-        //     (
-        //         ButtonBundle {
-        //             style: Style {
-        //                 flex_direction: FlexDirection::Row,
-        //                 justify_content: JustifyContent::Center,
-        //                 align_items: AlignItems::Center,
-        //                 width: Val::Px(600.),
-        //                 height: Val::Px(100.),
-        //                 ..Default::default()
-        //             },
-        //             ..Default::default()
-        //         },
-        //         PlayAgainButton {}
-        //     )
-        // ).with_children(|parent| {
-        //     parent.spawn(TextBundle {
-        //         text: Text {
-        //             sections: vec![
-        //                 draw_text(&asset_server, "PLAY AGAIN".to_string(), 80., Color::WHITE),
-        //             ],
-        //             justify: JustifyText::Center,
-        //             ..default()
-        //         },
-        //         ..Default::default()
-        //     });
-        // });
         parent.spawn(
-            (
-                ButtonBundle {
-                    style: Style {
-                        flex_direction: FlexDirection::Row,
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        width: Val::Px(600.),
-                        height: Val::Px(100.),
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                },
-                BackToMenuButton {}
-            )
+            get_menu_button_bundle(PlayAgainButton {})
+        ).with_children(|parent| {
+            spawn_text_bundle(parent, &asset_server, "PLAY AGAIN".to_string(), 80., Color::WHITE);
+        });
+        parent.spawn(
+            get_menu_button_bundle(BackToMenuButton {})
         ).with_children(|parent| {
             spawn_text_bundle(parent, &asset_server, "BACK TO MENU".to_string(), 80., Color::WHITE)
         });
@@ -246,47 +231,40 @@ pub fn react_to_play_button(
     if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
         match *interaction {
             Interaction::Pressed => { app_state_next_state.set(GameState::LoadInventory); },
-            Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
-            Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
+            Interaction::Hovered => { handle_button_hover(&mut bg_color) },
+            Interaction::None => { handle_button_none(&mut bg_color) }
         }
     }
 }
 
-// pub fn react_to_restart_button(
-//     mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<PlayAgainButton>)>,
-//     mut app_state_next_state: ResMut<NextState<GameState>>,
-//     mut final_menu_event_writer: EventWriter<FinalMenuClosed>
-// ) {
-//     if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
-//         match *interaction {
-//             Interaction::Pressed => { 
-//                 app_state_next_state.set(GameState::LoadInventory); 
-//                 final_menu_event_writer.send(FinalMenuClosed {});
-//             },
-//             Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
-//             Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
-//         }
-//     }
-// }
-
-pub fn react_to_back_to_menu_button(
-    mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<BackToMenuButton>)>,
-    mut final_menu_event_writer: EventWriter<FinalMenuClosed>,
+pub fn react_to_restart_button(
     mut commands: Commands,
+    mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<PlayAgainButton>)>,
+    mut final_menu_event_writer: EventWriter<FinalMenuClosed>,
     final_menu_query: Query<Entity, With<FinalMenu>>
 ) {
-    if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
-        match *interaction {
-            Interaction::Pressed => {
-                if let Ok(menu_entity) = final_menu_query.get_single() {
-                    commands.entity(menu_entity).despawn_recursive();
-                    final_menu_event_writer.send(FinalMenuClosed {});
-                }
-            },
-            Interaction::Hovered => { *bg_color = HOVERED_BUTTON_COLOR.into(); },
-            Interaction::None => { *bg_color = NORMAL_BUTTON_COLOR.into(); }
-        }
-    }
+    react_to_endgame_menu_button(
+        &mut commands,
+        &mut button_query,
+        &mut final_menu_event_writer,
+        &final_menu_query,
+        GameState::LoadInventory
+    );
+}
+
+pub fn react_to_back_to_menu_button(
+    mut commands: Commands,
+    mut button_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<BackToMenuButton>)>,
+    mut final_menu_event_writer: EventWriter<FinalMenuClosed>,
+    final_menu_query: Query<Entity, With<FinalMenu>>
+) {
+    react_to_endgame_menu_button(
+        &mut commands,
+        &mut button_query,
+        &mut final_menu_event_writer,
+        &final_menu_query,
+        GameState::MainMenu
+    );
 }
 
 pub fn despawn_main_menu(
@@ -321,7 +299,7 @@ pub fn check_despawn_final_menu(
     mut score: ResMut<Score>,
     mut app_state_next_state: ResMut<NextState<GameState>>
 ) {
-    for _ in final_menu_event_reader.read() {
+    for event in final_menu_event_reader.read() {
         for entity in object_query.iter_mut() {
             commands.entity(entity).despawn();
         }
@@ -335,7 +313,7 @@ pub fn check_despawn_final_menu(
             area_inventories.inventories[i].2 = AreaType::Empty;
         }
 
-        app_state_next_state.set(GameState::MainMenu);
+        app_state_next_state.set(event.new_state);
 
     }
 }

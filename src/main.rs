@@ -6,7 +6,7 @@ use enemy::{resources::LaserTimer, systems::{move_lasers, shoot_lasers, spawn_uf
 use game::{resources::Score, systems::{check_game_completed, draw_game_bg, handle_get_ready, reset_timers, spawn_camera}, GameState, WINDOW_HEIGHT, WINDOW_WIDTH};
 use item::{resources::CharItemInventory, systems::{draw_char_inventory_items, draw_inventory_bg}};
 use menu::{events::FinalMenuClosed, systems::{
-    check_despawn_final_menu, despawn_get_ready_info, despawn_inventory_info, despawn_main_menu, react_to_back_to_menu_button, /* react_to_exit_button, */ react_to_play_button /*, react_to_restart_button*/, spawn_endgame_menu, spawn_get_ready_info, spawn_inventory_info, spawn_main_menu
+    check_despawn_final_menu, despawn_get_ready_info, despawn_inventory_info, despawn_main_menu, react_to_back_to_menu_button, react_to_play_button, react_to_restart_button, spawn_endgame_menu, spawn_get_ready_info, spawn_inventory_info, spawn_main_menu
 }};
 use point_area::{
     events::AreaCaptured, 
@@ -59,15 +59,11 @@ fn main() {
             draw_inventory_bg,
             draw_game_bg,
         ))
-        .add_systems(OnEnter(GameState::MainMenu), (
-            spawn_main_menu, draw_point_areas
-        ))
+        .add_systems(OnEnter(GameState::MainMenu), spawn_main_menu)
+        .add_systems(Update, react_to_play_button.run_if(in_state(GameState::MainMenu)))
         .add_systems(OnEnter(GameState::LoadInventory), (
-            despawn_main_menu, spawn_inventory_info
+            despawn_main_menu, spawn_inventory_info, draw_point_areas
         ))
-        .add_systems(Update, (
-            react_to_play_button /* ,  react_to_exit_button */
-        ).run_if(in_state(GameState::MainMenu)))
         .add_systems(Update, (
                 handle_add_item, draw_char_inventory_items
             ).run_if(in_state(GameState::LoadInventory))
@@ -101,10 +97,10 @@ fn main() {
         .add_systems(OnEnter(GameState::GameOver), spawn_endgame_menu)
         .add_systems(OnEnter(GameState::Completed), spawn_endgame_menu)
         .add_systems(Update, (
-            /* react_to_restart_button, */ react_to_back_to_menu_button, check_despawn_final_menu
+            react_to_restart_button, react_to_back_to_menu_button, check_despawn_final_menu
         ).run_if(in_state(GameState::GameOver)))
         .add_systems(Update, (
-            /* react_to_restart_button, */ react_to_back_to_menu_button, check_despawn_final_menu
+            react_to_restart_button, react_to_back_to_menu_button, check_despawn_final_menu
         ).run_if(in_state(GameState::Completed)))
         .run();
 }

@@ -1,4 +1,10 @@
+use std::collections::HashMap;
+
 use bevy::prelude::*;
+
+use crate::game::GameState;
+
+use super::{components::FinalMenu, events::FinalMenuClosed, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR};
 
 pub fn get_menu_texts() -> [(String, f32); 6] {
     [
@@ -18,7 +24,7 @@ pub fn get_get_ready_texts() -> [(String, f32); 2] {
     ]
 }
 
-pub fn draw_text(
+fn draw_text(
     asset_server: &AssetServer,
     text: String,
     font_size: f32,
@@ -63,4 +69,69 @@ pub fn despawn_component(
     if let Ok(entity) = query.get_single() {
         commands.entity(entity).despawn_recursive();
     }
+}
+
+pub fn get_menu_button_bundle(
+    component: impl Component
+) -> (ButtonBundle, impl Component) {
+        (
+            ButtonBundle {
+                style: Style {
+                    flex_direction: FlexDirection::Row,
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    width: Val::Px(600.),
+                    height: Val::Px(100.),
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            component
+        )
+}
+
+pub fn handle_button_hover(
+    color: &mut BackgroundColor
+) -> () {
+    *color = HOVERED_BUTTON_COLOR.into();
+}
+
+pub fn handle_button_none(
+    color: &mut BackgroundColor
+) -> () {
+    *color = NORMAL_BUTTON_COLOR.into();
+}
+
+pub fn react_to_endgame_menu_button(
+    commands: &mut Commands,
+    button_query: &mut Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<impl Component>)>,
+    final_menu_event_writer: &mut EventWriter<FinalMenuClosed>,
+    final_menu_query: &Query<Entity, With<FinalMenu>>,
+    new_state: GameState
+) {
+    if let Ok((interaction, mut bg_color)) = button_query.get_single_mut() {
+        match *interaction {
+            Interaction::Pressed => { 
+                if let Ok(menu_entity) = final_menu_query.get_single() {
+                    commands.entity(menu_entity).despawn_recursive();
+                    final_menu_event_writer.send(FinalMenuClosed {
+                        new_state
+                    });
+                }
+            },
+            Interaction::Hovered => { handle_button_hover(&mut bg_color) },
+            Interaction::None => { handle_button_none(&mut bg_color) }
+        }
+    }
+}
+
+pub fn get_endgame_text(
+    game_state: &GameState
+) -> String {
+    let game_state_text_map: HashMap<GameState, &str> = HashMap::from([
+        (GameState::GameOver, "GAME OVER"),
+        (GameState::Completed, "CONGRATULATIONS")
+    ]);
+
+    game_state_text_map.get(&game_state).unwrap_or(&"").to_string()
 }
